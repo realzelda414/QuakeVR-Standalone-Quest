@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.vittorioromeo.quakevr.quest"
+    android:versionCode="1"
+    android:versionName="1.0.0">
+
+    <!-- Meta Quest Standalone VR Hardware Features -->
+    <uses-feature android:name="android.hardware.vr.headtracking" android:required="true" android:version="1" />
+    <uses-feature android:name="oculus.software.handtracking" android:required="false" />
+    <uses-feature android:glEsVersion="0x00030002" android:required="true" />
+
+    <!-- Storage permissions for loading Quake PAK0.PAK & PAK1.PAK files from /sdcard/QuakeVR -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="false"
+        android:label="QuakeVR Quest"
+        android:hasCode="false"
+        android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+
+        <!-- Target Meta Quest 2, Quest Pro, and Quest 3 (Eureka) -->
+        <meta-data android:name="com.oculus.supportedDevices" android:value="quest2|questpro|quest3|eureka" />
+        <meta-data android:name="com.oculus.handtracking.frequency" android:value="LOW" />
+
+        <activity
+            android:name="android.app.NativeActivity"
+            android:label="QuakeVR"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen"
+            android:configChanges="screenSize|screenLayout|orientation|keyboardHidden|keyboard|navigation|uiMode"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape"
+            android:exported="true">
+
+            <!-- Tell NativeActivity which shared library to load -->
+            <meta-data android:name="android.app.lib_name" android:value="quakevr" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <!-- Meta Quest VR App Category -->
+                <category android:name="com.oculus.intent.category.VR" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
