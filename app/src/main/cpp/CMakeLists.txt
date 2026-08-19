@@ -19,7 +19,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -flto -fexceptions -frtt
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/vr
-    ${CMAKE_CURRENT_SOURCE_DIR}/engine
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${ANDROID_NDK}/sources/android/native_app_glue
 )
@@ -35,11 +34,10 @@ set_target_properties(openxr_loader PROPERTIES
     IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/libs/${ANDROID_ABI}/libopenxr_loader.so
 )
 
-# QuakeVR Core Shared Library
+# QuakeVR Core Shared Library (Only real existing files)
 add_library(quakevr SHARED
     android_main.cpp
     vr/quakevr_bridge.cpp
-    engine/quake_stub.cpp
 )
 
 # Link all required Android system libraries, EGL/GLESv3, and OpenXR
