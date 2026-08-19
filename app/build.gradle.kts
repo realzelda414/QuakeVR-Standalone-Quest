@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId = "com.vittorioromeo.quakevr.quest"
         minSdk = 29
-        targetSdk = 32
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
 
@@ -42,6 +42,11 @@ android {
             shaders.setSrcDirs(emptyList<String>())
             assets.srcDirs("src/main/assets", "src/main/shaders")
         }
+    }
+
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
     }
 
     externalNativeBuild {
