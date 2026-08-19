@@ -1,12 +1,19 @@
 #pragma once
 
+#include <android/native_window.h>
+#include <android_native_app_glue.h>
+#include <EGL/egl.h>
+#include <GLES3/gl3.h>
+
+#define XR_USE_PLATFORM_ANDROID 1
+#define XR_USE_GRAPHICS_API_OPENGL_ES 1
+
 #include <openxr/openxr.h>
 #include <openxr/openxr_platform.h>
-#include <GLES3/gl32.h>
-#include <array>
+
 #include <vector>
-#include <memory>
 #include <string>
+#include <memory>
 
 // QuakeVR Math structures compatible with Vittorio Romeo's engine
 struct Vec3 {
