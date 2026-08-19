@@ -1,10 +1,11 @@
 #include "quakevr_bridge.hpp"
+#include <EGL/egl.h>
+#include <GLES3/gl3.h>
 #include <android/log.h>
-#include <android_native_app_glue.h>
 #include <cmath>
 #include <cstring>
 
-#define LOG_TAG "QuakeVR-OpenXR"
+#define LOG_TAG "QuakeVR-Bridge"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
