@@ -23,13 +23,14 @@ jobs:
         with:
           ndk-version: r25c
 
-      - name: Download Meta OpenXR Loader for ARM64
+      - name: Fetch Official OpenXR Android Loader
         run: |
           mkdir -p app/src/main/cpp/libs/arm64-v8a
-          # Download official Khronos / Meta OpenXR Android Loader binary
-          curl -L -o openxr_loader.aar https://github.com/KhronosGroup/OpenXR-SDK-Source/releases/download/release-1.0.34/openxr_loader_for_android-1.0.34.aar
-          unzip -p openxr_loader.aar jni/arm64-v8a/libopenxr_loader.so > app/src/main/cpp/libs/arm64-v8a/libopenxr_loader.so
-          rm openxr_loader.aar
+          mkdir -p /tmp/openxr
+          curl -fSL -o /tmp/openxr/openxr.aar "https://repo1.maven.org/maven2/org/khronos/openxr/openxr_loader_for_android/1.0.34/openxr_loader_for_android-1.0.34.aar"
+          unzip -o /tmp/openxr/openxr.aar -d /tmp/openxr/extracted
+          find /tmp/openxr/extracted -name "libopenxr_loader.so" | grep "arm64" | head -n 1 | xargs -I {} cp {} app/src/main/cpp/libs/arm64-v8a/libopenxr_loader.so
+          ls -la app/src/main/cpp/libs/arm64-v8a/
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
