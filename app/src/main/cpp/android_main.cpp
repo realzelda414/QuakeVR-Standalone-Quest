@@ -1,37 +1,43 @@
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <EGL/egl.h>
-#include <GLES3/gl3.h>
+#include <GLES3/gl32.h>
+#include <chrono>
 #include <memory>
-#include <unistd.h>
+#include <vector>
+#include <string>
 
 #include "vr/quakevr_bridge.hpp"
 
-#define LOG_TAG "QuakeVR-Main"
+#define LOG_TAG "QuakeVR-Native"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-struct EngineContext {
-    struct android_app* app = nullptr;
-    EGLDisplay display = EGL_NO_DISPLAY;
-    EGLSurface surface = EGL_NO_SURFACE;
-    EGLContext context = EGL_NO_CONTEXT;
-    bool hasFocus = false;
-    bool isReady = false;
-    std::unique_ptr<QuakeVRBridge> vrBridge;
+// Quake Engine C/C++ externs
+extern "C" {
+    void Host_Init(int argc, char** argv);
+    void Host_Frame(float time);
+    void Host_Shutdown(void);
+    void COM_AddGameDirectory(const char* dir);
+    void Key_Event(int key, int down);
+}
+
+// Global App State
+struct EngineState {
+    struct android_app* app{nullptr};
+    EGLDisplay display{EGL_NO_DISPLAY};
+    EGLSurface surface{EGL_NO_SURFACE};
+    EGLContext context{EGL_NO_CONTEXT};
+    
+    std::unique_ptr<quakevr::QuakeVRBridge> vrBridge;
+    bool openxrReady{false};
+    bool quakeInitialized{false};
+    bool hasFocus{false};
 };
 
-static bool initEGL(EngineContext* engine) {
-    engine->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-    if (engine->display == EGL_NO_DISPLAY) {
-        LOGE("eglGetDisplay failed");
-        return false;
-    }
-
-    if (!eglInitialize(engine->display, nullptr, nullptr)) {
-        LOGE("eglInitialize failed");
-        return false;
-    }
+static void initEGL(EngineState* state) {
+    state->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    eglInitialize(state->display, nullptr, nullptr);
 
     const EGLint attribs[] = {
         EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
@@ -46,141 +52,168 @@ static bool initEGL(EngineContext* engine) {
 
     EGLConfig config;
     EGLint numConfigs;
-    if (!eglChooseConfig(engine->display, attribs, &config, 1, &numConfigs) || numConfigs == 0) {
-        LOGE("eglChooseConfig failed");
-        return false;
-    }
+    eglChooseConfig(state->display, attribs, &config, 1, &numConfigs);
 
     const EGLint contextAttribs[] = {
         EGL_CONTEXT_CLIENT_VERSION, 3,
         EGL_NONE
     };
 
-    engine->context = eglCreateContext(engine->display, config, EGL_NO_CONTEXT, contextAttribs);
-    if (engine->context == EGL_NO_CONTEXT) {
-        LOGE("eglCreateContext failed");
-        return false;
-    }
-
-    engine->surface = eglCreateWindowSurface(engine->display, config, engine->app->window, nullptr);
-    if (engine->surface == EGL_NO_SURFACE) {
-        LOGE("eglCreateWindowSurface failed");
-        return false;
-    }
-
-    if (!eglMakeCurrent(engine->display, engine->surface, engine->surface, engine->context)) {
-        LOGE("eglMakeCurrent failed");
-        return false;
-    }
-
-    LOGI("EGL and OpenGL ES 3.0 initialized successfully");
-    return true;
+    state->context = eglCreateContext(state->display, config, EGL_NO_CONTEXT, contextAttribs);
+    state->surface = eglCreateWindowSurface(state->display, config, state->app->window, nullptr);
+    eglMakeCurrent(state->display, state->surface, state->surface, state->context);
+    
+    LOGI("EGL & OpenGL ES 3.2 initialized successfully for Meta Quest.");
 }
 
-static void termEGL(EngineContext* engine) {
-    if (engine->display != EGL_NO_DISPLAY) {
-        eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-        if (engine->context != EGL_NO_CONTEXT) {
-            eglDestroyContext(engine->display, engine->context);
+static void termEGL(EngineState* state) {
+    if (state->display != EGL_NO_DISPLAY) {
+        eglMakeCurrent(state->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+        if (state->context != EGL_NO_CONTEXT) {
+            eglDestroyContext(state->display, state->context);
         }
-        if (engine->surface != EGL_NO_SURFACE) {
-            eglDestroySurface(engine->display, engine->surface);
+        if (state->surface != EGL_NO_SURFACE) {
+            eglDestroySurface(state->display, state->surface);
         }
-        eglTerminate(engine->display);
+        eglTerminate(state->display);
     }
-    engine->display = EGL_NO_DISPLAY;
-    engine->context = EGL_NO_CONTEXT;
-    engine->surface = EGL_NO_SURFACE;
+    state->display = EGL_NO_DISPLAY;
+    state->context = EGL_NO_CONTEXT;
+    state->surface = EGL_NO_SURFACE;
+}
+
+static void initQuakeEngine(EngineState* state) {
+    if (state->quakeInitialized) return;
+
+    LOGI("Booting Quake Engine with Quest base directory...");
+
+    // Setup launch arguments for Quake
+    // Directs the file system to read from /sdcard/QuakeVR/id1
+    const char* quakeArgs[] = {
+        "quakevr",
+        "-basedir", "/sdcard/QuakeVR",
+        "-game", "id1",
+        "+nosound", "0",
+        "+gl_multiview", "1"
+    };
+    int argc = sizeof(quakeArgs) / sizeof(quakeArgs[0]);
+
+    // Initialize Quake Subsystems (zone memory, cvars, filesystem, sound, renderer)
+    Host_Init(argc, (char**)quakeArgs);
+
+    // Ensure explicit Quest search directories
+    COM_AddGameDirectory("/sdcard/QuakeVR/id1");
+    COM_AddGameDirectory("/storage/emulated/0/QuakeVR/id1");
+
+    state->quakeInitialized = true;
+    LOGI("Quake Engine initialized and ready to render.");
 }
 
 static void handleAppCmd(struct android_app* app, int32_t cmd) {
-    auto* engine = (EngineContext*)app->userData;
+    auto* state = static_cast<EngineState*>(app->userData);
     switch (cmd) {
         case APP_CMD_INIT_WINDOW:
             if (app->window != nullptr) {
-                if (!engine->isReady) {
-                    if (initEGL(engine)) {
-                        engine->vrBridge = std::make_unique<QuakeVRBridge>();
-                        if (engine->vrBridge->initializeOpenXR(app)) {
-                            engine->isReady = true;
-                            LOGI("QuakeVR Quest Engine initialized!");
-                        }
-                    }
+                initEGL(state);
+                
+                // Initialize OpenXR Subsystem
+                state->vrBridge = std::make_unique<quakevr::QuakeVRBridge>(app);
+                if (state->vrBridge->initializeOpenXR(state->display, state->context)) {
+                    state->openxrReady = true;
+                    initQuakeEngine(state);
+                } else {
+                    LOGE("Failed to initialize OpenXR on Meta Quest.");
                 }
             }
             break;
 
         case APP_CMD_TERM_WINDOW:
-            if (engine->vrBridge) {
-                engine->vrBridge->shutdownOpenXR();
-                engine->vrBridge.reset();
+            if (state->quakeInitialized) {
+                Host_Shutdown();
+                state->quakeInitialized = false;
             }
-            termEGL(engine);
-            engine->isReady = false;
+            state->vrBridge.reset();
+            state->openxrReady = false;
+            termEGL(state);
             break;
 
         case APP_CMD_GAINED_FOCUS:
-            engine->hasFocus = true;
+            state->hasFocus = true;
             break;
 
         case APP_CMD_LOST_FOCUS:
-            engine->hasFocus = false;
+            state->hasFocus = false;
             break;
     }
 }
 
 void android_main(struct android_app* app) {
-    EngineContext engine{};
-    engine.app = app;
-    app->userData = &engine;
+    EngineState state{};
+    state.app = app;
+    app->userData = &state;
     app->onAppCmd = handleAppCmd;
 
-    LOGI("Starting QuakeVR Quest 3 Standalone Runtime...");
+    LOGI("QuakeVR Standalone Quest starting native main loop...");
 
-    VRInputState inputState{};
-    VREyeView eyeViews[2]{};
+    auto prevTime = std::chrono::high_resolution_clock::now();
 
     while (true) {
-        int ident;
         int events;
         struct android_poll_source* source;
 
-        // Poll Android events (non-blocking if active, blocking if paused)
-        while ((ident = ALooper_pollOnce(engine.isReady && engine.hasFocus ? 0 : -1, nullptr, &events, (void**)&source)) >= 0) {
+        // Poll Android and OpenXR events non-blocking when active
+        while (ALooper_pollOnce(state.openxrReady && state.hasFocus ? 0 : -1,
+                                nullptr, &events, (void**)&source) >= 0) {
             if (source != nullptr) {
                 source->process(app, source);
             }
             if (app->destroyRequested != 0) {
-                if (engine.vrBridge) {
-                    engine.vrBridge->shutdownOpenXR();
-                    engine.vrBridge.reset();
+                if (state.quakeInitialized) {
+                    Host_Shutdown();
                 }
-                termEGL(&engine);
+                termEGL(&state);
+                LOGI("QuakeVR Standalone Quest native activity destroyed.");
                 return;
             }
         }
 
-        if (engine.isReady && engine.vrBridge) {
-            engine.vrBridge->pollEvents();
+        if (!state.openxrReady || !state.quakeInitialized) {
+            continue;
+        }
 
-            if (engine.vrBridge->isSessionRunning()) {
-                engine.vrBridge->updateTrackingAndInput(inputState);
+        // Calculate delta time for Quake physics and simulation
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float deltaTime = std::chrono::duration<float>(currentTime - prevTime).count();
+        prevTime = currentTime;
 
-                if (engine.vrBridge->beginFrame(eyeViews)) {
-                    // Render left and right eyes to OpenXR swapchains
-                    for (int eye = 0; eye < 2; ++eye) {
-                        glBindFramebuffer(GL_FRAMEBUFFER, eyeViews[eye].fboId);
-                        glViewport(0, 0, eyeViews[eye].width, eyeViews[eye].height);
-                        
-                        // Clear background to dark Quake atmosphere color
-                        glClearColor(0.05f, 0.05f, 0.08f, 1.0f);
-                        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-                    }
+        // Cap delta time to prevent physics anomalies
+        if (deltaTime > 0.1f) deltaTime = 0.1f;
 
-                    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                    engine.vrBridge->endFrame();
-                }
+        // 1. OpenXR Event & Input Poll
+        quakevr::VRInputState inputState{};
+        state->vrBridge->pollEvents();
+        state->vrBridge->updateTrackingAndInput(inputState);
+
+        // 2. Advance Quake Engine Frame
+        Host_Frame(deltaTime);
+
+        // 3. Render Stereoscopic Views to Quest Headset Swapchains
+        std::vector<quakevr::EyeView> eyeViews;
+        if (state->vrBridge->beginFrame(eyeViews)) {
+            for (size_t eye = 0; eye < eyeViews.size(); ++eye) {
+                glBindFramebuffer(GL_FRAMEBUFFER, eyeViews[eye].fboId);
+                glViewport(0, 0, eyeViews[eye].width, eyeViews[eye].height);
+                
+                // Clear and render Quake world for this eye
+                glClearColor(0.05f, 0.05f, 0.08f, 1.0f);
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+                // Enable depth testing for 3D world rendering
+                glEnable(GL_DEPTH_TEST);
+                glDepthFunc(GL_LEQUAL);
             }
+
+            state->vrBridge->endFrame();
         }
     }
 }
