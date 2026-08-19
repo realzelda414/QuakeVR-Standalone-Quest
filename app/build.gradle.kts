@@ -8,13 +8,13 @@ android {
 
     defaultConfig {
         applicationId = "com.vittorioromeo.quakevr.quest"
-        minSdk = 29 // Android 10 (Meta Horizon OS baseline)
+        minSdk = 29
         targetSdk = 32
         versionCode = 1
         versionName = "1.0.0"
 
         ndk {
-            abiFilters.add("arm64-v8a") // 64-bit ARM for Snapdragon XR2 Gen 2
+            abiFilters.addAll(listOf("arm64-v8a"))
         }
 
         externalNativeBuild {
@@ -28,8 +28,19 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("debug") // Pre-signed for easy sideloading
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    // Disable Vulkan glslc shader compilation for OpenGL ES GLSL shaders
+    sourceSets {
+        getByName("main") {
+            shaders.setSrcDirs(emptyList<String>())
+            assets.srcDirs("src/main/assets", "src/main/shaders")
         }
     }
 
@@ -47,5 +58,5 @@ android {
 }
 
 dependencies {
-    // Standard native dependencies
+    // Native OpenXR application with no Java UI dependencies required
 }
