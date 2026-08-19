@@ -23,13 +23,34 @@ jobs:
         with:
           ndk-version: r25c
 
-      - name: Fetch Official OpenXR Android Loader
+      - name: Fetch Official OpenXR Android SDK (Headers & Binaries)
         run: |
           mkdir -p app/src/main/cpp/libs/arm64-v8a
+          mkdir -p app/src/main/cpp/include/openxr
           mkdir -p /tmp/openxr
+          
+          # 1. Download official OpenXR Android package
           curl -fSL -o /tmp/openxr/openxr.aar "https://repo1.maven.org/maven2/org/khronos/openxr/openxr_loader_for_android/1.0.34/openxr_loader_for_android-1.0.34.aar"
           unzip -o /tmp/openxr/openxr.aar -d /tmp/openxr/extracted
+          
+          # 2. Extract arm64-v8a libopenxr_loader.so
           find /tmp/openxr/extracted -name "libopenxr_loader.so" | grep "arm64" | head -n 1 | xargs -I {} cp {} app/src/main/cpp/libs/arm64-v8a/libopenxr_loader.so
+          
+          # 3. Extract OpenXR C/C++ Header files (openxr.h, openxr_platform.h, etc.)
+          HEADER_DIR=$(find /tmp/openxr/extracted -type d -name "openxr" | head -n 1)
+          if [ -d "$HEADER_DIR" ]; then
+            cp -r "$HEADER_DIR"/* app/src/main/cpp/include/openxr/
+          else
+            # Fallback direct download of Khronos OpenXR headers if not inside prefab
+            curl -fSL -o app/src/main/cpp/include/openxr/openxr.h "https://raw.githubusercontent.com/KhronosGroup/OpenXR-SDK-Source/main/include/openxr/openxr.h"
+            curl -fSL -o app/src/main/cpp/include/openxr/openxr_platform.h "https://raw.githubusercontent.com/KhronosGroup/OpenXR-SDK-Source/main/include/openxr/openxr_platform.h"
+            curl -fSL -o app/src/main/cpp/include/openxr/openxr_reflection.h "https://raw.githubusercontent.com/KhronosGroup/OpenXR-SDK-Source/main/include/openxr/openxr_reflection.h"
+            curl -fSL -o app/src/main/cpp/include/openxr/openxr_platform_defines.h "https://raw.githubusercontent.com/KhronosGroup/OpenXR-SDK-Source/main/include/openxr/openxr_platform_defines.h"
+          fi
+
+          echo "Extracted OpenXR Headers:"
+          ls -la app/src/main/cpp/include/openxr/
+          echo "Extracted OpenXR Loader:"
           ls -la app/src/main/cpp/libs/arm64-v8a/
 
       - name: Setup Gradle
