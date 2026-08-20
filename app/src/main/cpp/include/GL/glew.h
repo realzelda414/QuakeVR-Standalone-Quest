@@ -87,6 +87,7 @@
     #define GL_MODULATE 0x2100
     #define GL_DECAL 0x2101
     #define GL_REPLACE 0x1E01
+    #define GL_ADD 0x0104
     #define GL_PERSPECTIVE_CORRECTION_HINT 0x0C50
     #define GL_GENERATE_MIPMAP 0x8191
 
