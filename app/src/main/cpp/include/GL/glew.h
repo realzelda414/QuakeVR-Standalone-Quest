@@ -1,6 +1,10 @@
 #pragma once
 
 #if defined(__ANDROID__) || defined(ANDROID)
+    #include <unistd.h>
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
     #include <GLES3/gl32.h>
     #include <GLES3/gl3ext.h>
     #include <EGL/egl.h>
