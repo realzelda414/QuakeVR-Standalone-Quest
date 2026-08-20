@@ -20,6 +20,29 @@ typedef int SDL_bool;
 
 typedef struct SDL_Window SDL_Window;
 typedef void* SDL_GLContext;
+typedef uint32_t SDL_AudioDeviceID;
+typedef uint16_t SDL_AudioFormat;
+
+#define AUDIO_U8        0x0008
+#define AUDIO_S8        0x8008
+#define AUDIO_U16LSB    0x0010
+#define AUDIO_S16LSB    0x8010
+#define AUDIO_S16SYS    AUDIO_S16LSB
+#define AUDIO_S16       AUDIO_S16LSB
+
+typedef void (*SDL_AudioCallback)(void *userdata, Uint8 *stream, int len);
+
+typedef struct SDL_AudioSpec {
+    int freq;
+    SDL_AudioFormat format;
+    Uint8 channels;
+    Uint8 silence;
+    Uint16 samples;
+    Uint16 padding;
+    Uint32 size;
+    SDL_AudioCallback callback;
+    void *userdata;
+} SDL_AudioSpec;
 
 typedef struct SDL_DisplayMode {
     Uint32 format;
@@ -62,6 +85,19 @@ inline int SDL_SetRelativeMouseMode(SDL_bool enabled) {
 
 inline SDL_bool SDL_GetRelativeMouseMode(void) {
     return (SDL_bool)0;
+}
+
+inline SDL_AudioDeviceID SDL_OpenAudioDevice(const char *device, int iscapture, const SDL_AudioSpec *desired, SDL_AudioSpec *obtained, int allowed_changes) {
+    (void)device; (void)iscapture; (void)desired; (void)obtained; (void)allowed_changes;
+    return 0;
+}
+
+inline void SDL_CloseAudioDevice(SDL_AudioDeviceID dev) {
+    (void)dev;
+}
+
+inline void SDL_PauseAudioDevice(SDL_AudioDeviceID dev, int pause_on) {
+    (void)dev; (void)pause_on;
 }
 
 #ifdef __cplusplus
