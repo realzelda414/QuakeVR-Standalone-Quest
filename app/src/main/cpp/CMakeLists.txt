@@ -32,8 +32,8 @@ add_definitions(
     -DGLEW_NO_GLU=1
 )
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include unistd.h -O3 -ffast-math -flto")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -include unistd.h -O3 -ffast-math -flto -fexceptions -frtti")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include unistd.h -O3 -ffast-math -flto -Wno-format-security -Wno-error")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -include unistd.h -O3 -ffast-math -flto -fexceptions -frtti -Wno-format-security -Wno-error -Wno-deprecated-volatile")
 
 # Include paths - local Quest compatibility headers first
 include_directories(
