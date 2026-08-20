@@ -8,7 +8,7 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Quake Engine Declarations (C Linkage)
+// Quake Engine Declarations (C++ linkage to match Quake/host.cpp)
 typedef struct quakeparms_s {
     const char *basedir;
     const char *userdir;
@@ -18,12 +18,10 @@ typedef struct quakeparms_s {
     int memsize;
 } quakeparms_t;
 
-extern "C" {
-    void Host_Init(quakeparms_t *parms);
-    void _Host_Frame(double time);
-    void Host_Shutdown(void);
-    double Sys_DoubleTime(void);
-}
+void Host_Init(quakeparms_t *parms);
+void _Host_Frame(double time);
+void Host_Shutdown(void);
+double Sys_DoubleTime(void);
 
 // OpenXR Bridge Declarations
 namespace quake {
