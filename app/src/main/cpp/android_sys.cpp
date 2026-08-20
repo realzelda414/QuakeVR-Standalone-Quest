@@ -9,6 +9,7 @@
 #include <string.h>
 #include <errno.h>
 #include <android/log.h>
+#include <android_native_app_glue.h>
 
 #define LOG_TAG "QuakeVR-Sys"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -44,9 +45,19 @@ typedef struct {
 } viddef_t;
 
 struct dma_t;
+struct dma_s;
 struct usercmd_t;
 struct sizebuf_t;
 struct client_t;
+
+typedef struct quakeparms_s {
+    const char *basedir;
+    const char *userdir;
+    int argc;
+    char **argv;
+    void *membase;
+    int memsize;
+} quakeparms_t;
 
 // Global Engine State
 qboolean isDedicated = qfalse;
@@ -211,15 +222,19 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA Stubs
-int SNDDMA_Init(void *dma) { (void)dma; return 0; }
-int SNDDMA_Init(void) { return 0; }
-int SNDDMA_GetDMAPos(void) { return 0; }
-void SNDDMA_BlockSound(void) {}
-void SNDDMA_UnblockSound(void) {}
-void* SNDDMA_LockBuffer(void) { return NULL; }
-void SNDDMA_Submit(void) {}
-void SNDDMA_Shutdown(void) {}
+// Sound DMA Stubs (C and C++ overload coverage)
+extern "C" {
+    int SNDDMA_Init(void *dma) { (void)dma; return 0; }
+    int SNDDMA_GetDMAPos(void) { return 0; }
+    void SNDDMA_BlockSound(void) {}
+    void SNDDMA_UnblockSound(void) {}
+    void* SNDDMA_LockBuffer(void) { return NULL; }
+    void SNDDMA_Submit(void) {}
+    void SNDDMA_Shutdown(void) {}
+}
+
+int SNDDMA_Init(struct dma_s *dma) { (void)dma; return 0; }
+int SNDDMA_Init(struct dma_t *dma) { (void)dma; return 0; }
 
 // Client & Server VOIP Stubs
 void S_Voip_Init(void) {}
@@ -234,7 +249,7 @@ void SV_VoiceInitClient(client_t *cl) { (void)cl; }
 void SV_VoiceSendPacket(client_t *cl, sizebuf_t *msg) { (void)cl; (void)msg; }
 void SV_VoiceReadPacket(client_t *cl) { (void)cl; }
 
-// Desktop SteamVR OpenVR Stubs
+// OpenVR Desktop SteamVR Stubs
 extern "C" {
     uint32_t VR_InitInternal2(void *peError, int eApplicationType, const char *pStartupInfo) {
         (void)peError; (void)eApplicationType; (void)pStartupInfo;
@@ -256,4 +271,17 @@ extern "C" {
         (void)error;
         return "OpenVR unsupported on Quest Standalone (Using OpenXR)";
     }
+}
+
+// OpenXR Bridge Stubs
+namespace quake {
+namespace vr {
+namespace bridge {
+    bool is_session_running(void) { return true; }
+    void begin_frame(void) {}
+    void end_frame(void) {}
+    bool init_openxr(android_app *app) { (void)app; return true; }
+    void shutdown_openxr(void) {}
+}
+}
 }
