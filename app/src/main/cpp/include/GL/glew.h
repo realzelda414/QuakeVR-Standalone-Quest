@@ -49,6 +49,17 @@
     #define glClientActiveTextureARB glActiveTexture
     #define glMultiTexCoord2fARB(target, s, t)
 
+    #define GL_TEXTURE0_ARB 0x84C0
+    #define GL_TEXTURE1_ARB 0x84C1
+    #define GL_TEXTURE2_ARB 0x84C2
+    #define GL_TEXTURE3_ARB 0x84C3
+    #define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+
+    // Desktop glGetTexImage stub for GLES3
+    inline void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void* pixels) {
+        (void)target; (void)level; (void)format; (void)type; (void)pixels;
+    }
+
     // Legacy OpenGL Immediate Mode & Matrix Constants
     #define GL_QUADS 0x0007
     #define GL_QUAD_STRIP 0x0008
