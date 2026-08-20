@@ -4,7 +4,17 @@ project(quakevr C CXX)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 20)
 
-# Anchor to repository root (4 levels up from app/src/main/cpp/)
+include(FetchContent)
+
+# Automatically download header-only GLM for Quest vector/matrix math
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 0.9.9.8
+)
+FetchContent_MakeAvailable(glm)
+
+# Anchor to repository root
 get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../" ABSOLUTE)
 
 add_definitions(
@@ -16,18 +26,20 @@ add_definitions(
     -DUSE_GLES3=1
     -DQUAKE_VR=1
     -DQUAKESPASM=1
+    -DGLM_ENABLE_EXPERIMENTAL=1
 )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -ffast-math -flto")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -O3 -ffast-math -flto -fexceptions -frtti")
 
-# Include directories from root Quake folder, vr bridge, and android headers
+# Include paths
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/vr
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${REPO_ROOT}/Quake
     ${REPO_ROOT}/src
+    ${glm_SOURCE_DIR}
     ${ANDROID_NDK}/sources/android/native_app_glue
 )
 
@@ -48,12 +60,14 @@ file(GLOB_RECURSE QUAKE_ROOT_SOURCES
     "${REPO_ROOT}/Quake/*.cpp"
 )
 
-# Exclude desktop-only platform backends (e.g. desktop SDL/Windows drivers)
-list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_sdl\\.c$")
-list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_win\\.c$")
-list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_win\\.cpp$")
-list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_win\\.c$")
-list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "in_win\\.c$")
+# Exclude desktop-only platform backends (SDL, Windows drivers)
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "snd_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "in_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_win\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_win\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "in_win\\.(c|cpp)$")
 
 # Build the main QuakeVR Quest shared library
 add_library(quakevr SHARED
@@ -63,6 +77,7 @@ add_library(quakevr SHARED
 )
 
 target_link_libraries(quakevr
+    glm::glm
     native_app_glue
     openxr_loader
     android
