@@ -54,13 +54,19 @@
     #define GL_TEXTURE2_ARB 0x84C2
     #define GL_TEXTURE3_ARB 0x84C3
     #define GL_TEXTURE_MAX_ANISOTROPY_EXT 0x84FE
+    #define GL_MULTISAMPLE 0x809D
+    #define GL_TEXTURE_2D_MULTISAMPLE 0x9100
 
-    // Desktop glGetTexImage stub for GLES3
+    // Desktop glGetTexImage & glTexImage2DMultisample stubs for GLES3
     inline void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void* pixels) {
         (void)target; (void)level; (void)format; (void)type; (void)pixels;
     }
 
-    // Legacy OpenGL Immediate Mode & Matrix Constants
+    inline void glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations) {
+        glTexStorage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations);
+    }
+
+    // Legacy OpenGL Immediate Mode, Attribute & Matrix Constants
     #define GL_QUADS 0x0007
     #define GL_QUAD_STRIP 0x0008
     #define GL_POLYGON 0x0009
@@ -90,6 +96,9 @@
     #define GL_ADD 0x0104
     #define GL_PERSPECTIVE_CORRECTION_HINT 0x0C50
     #define GL_GENERATE_MIPMAP 0x8191
+    #define GL_TRANSFORM_BIT 0x00001000
+    #define GL_ENABLE_BIT 0x00002000
+    #define GL_ALL_ATTRIB_BITS 0x000FFFFF
 
     // Shading, Color Format, and Polygon Offset constants
     #define GL_FLAT 0x1D00
@@ -132,7 +141,7 @@
     #define GL_COMPRESSED_RGBA_ASTC_12x10_KHR 0x93BC
     #define GL_COMPRESSED_RGBA_ASTC_12x12_KHR 0x93BD
 
-    // Legacy Stubs for Immediate Mode Calls
+    // Legacy Stubs for Immediate Mode Calls & Attribs
     inline void glBegin(GLenum mode) { (void)mode; }
     inline void glEnd(void) {}
     inline void glVertex2f(GLfloat x, GLfloat y) { (void)x; (void)y; }
@@ -151,6 +160,8 @@
     inline void glMatrixMode(GLenum mode) { (void)mode; }
     inline void glPushMatrix(void) {}
     inline void glPopMatrix(void) {}
+    inline void glPushAttrib(GLbitfield mask) { (void)mask; }
+    inline void glPopAttrib(void) {}
     inline void glLoadIdentity(void) {}
     inline void glLoadMatrixf(const GLfloat* m) { (void)m; }
     inline void glMultMatrixf(const GLfloat* m) { (void)m; }
