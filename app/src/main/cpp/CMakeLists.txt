@@ -51,7 +51,7 @@ file(GLOB QUAKE_SOURCES
     ${QUAKE_SRC_DIR}/*.cpp
 )
 
-# Exclude desktop SDL, Windows, desktop platform layers, and desktop VOIP
+# Exclude desktop SDL, Windows, desktop platform layers, VOIP, and embedded lodepng
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_win\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_win32\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_sdl.*\\.(c|cpp)$")
@@ -65,6 +65,7 @@ list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*net_wins\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*net_wipx\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*pl_.*\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*snd_voip\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*lodepng\\.(c|cpp)$")
 
 # Prebuilt OpenXR Loader from Quest SDK
 add_library(openxr_loader SHARED IMPORTED)
