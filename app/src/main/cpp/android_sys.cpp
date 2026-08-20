@@ -63,6 +63,21 @@ cvar_t vid_gamma = {"gamma", "1.0", CVAR_ARCHIVE, 1.0f, NULL};
 cvar_t vid_contrast = {"contrast", "1.0", CVAR_ARCHIVE, 1.0f, NULL};
 cvar_t sys_throttle = {"sys_throttle", "0.0", 0, 0.0f, NULL};
 
+// VOIP Cvars
+cvar_t sv_voip = {"sv_voip", "0", 0, 0.0f, NULL};
+cvar_t sv_voip_echo = {"sv_voip_echo", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_test = {"cl_voip_test", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_vad_delay = {"cl_voip_vad_delay", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_capturingvol = {"cl_voip_capturingvol", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_showmeter = {"cl_voip_showmeter", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_play = {"cl_voip_play", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_micamp = {"cl_voip_micamp", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_ducking = {"cl_voip_ducking", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_noisefilter = {"cl_voip_noisefilter", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_autogain = {"cl_voip_autogain", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_opus_bitrate = {"cl_voip_opus_bitrate", "0", 0, 0.0f, NULL};
+cvar_t cl_voip_send = {"cl_voip_send", "0", 0, 0.0f, NULL};
+
 // Time & Sleep
 double Sys_DoubleTime(void) {
     struct timeval tp;
@@ -75,7 +90,7 @@ void Sys_Sleep(unsigned long msecs) {
     usleep(msecs * 1000);
 }
 
-// Print & Error
+// Print, Error & Quit
 void Sys_Printf(const char *fmt, ...) {
     char buf[4096];
     va_list ap;
@@ -95,7 +110,15 @@ void Sys_Error(const char *error, ...) {
     exit(1);
 }
 
+void Sys_Quit(void) {
+    exit(0);
+}
+
 const char* Sys_ConsoleInput(void) {
+    return NULL;
+}
+
+char* PL_GetClipboardData(void) {
     return NULL;
 }
 
@@ -155,8 +178,11 @@ int Sys_mkdir(const char *path) {
 
 // Video / Framebuffer Stubs (Handled by OpenXR Swapchain)
 void VID_Init(void) {}
+void VID_Shutdown(void) {}
 void VID_Lock(void) {}
 void VID_Unlock(void) {}
+void VID_Toggle(void) {}
+void VID_SyncCvars(void) {}
 void GL_BeginRendering(int *x, int *y, int *width, int *height) {
     if (x) *x = 0;
     if (y) *y = 0;
@@ -167,6 +193,7 @@ void GL_EndRendering(void) {}
 
 // Input Stubs (Handled by OpenXR Touch Controller Bridge)
 void IN_Init(void) {}
+void IN_Shutdown(void) {}
 void IN_Commands(void) {}
 void IN_UpdateGrabs(void) {}
 void IN_UpdateInputMode(void) {}
@@ -183,3 +210,6 @@ void SNDDMA_Shutdown(void) {}
 void S_Voip_Transmit(unsigned char flags, sizebuf_t *sb) { (void)flags; (void)sb; }
 void S_Voip_MapChange(void) {}
 void S_Voip_Parse(void) {}
+
+// OpenVR Desktop SteamVR stub (bypassed on Quest OpenXR)
+extern "C" void VR_ShutdownInternal(void) {}
