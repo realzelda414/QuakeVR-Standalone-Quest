@@ -1,3 +1,4 @@
+#include "quakedef.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -14,38 +15,33 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Forward declare engine types
-typedef int qboolean;
-#define qtrue 1
-#define qfalse 0
-
-typedef struct {
-    int width;
-    int height;
-    int colormask;
-    int rowbytes;
-    int pixelbytes;
-    int buffer;
-    int conwidth;
-    int conheight;
-    int direct;
-    int aspect;
-    int recalc_refdef;
-} viddef_t;
-
-struct usercmd_t;
-struct sizebuf_t;
-
 // Global engine state
 qboolean isDedicated = qfalse;
 viddef_t vid = { 1920, 1080, 0, 1920 * 4, 4, 0, 640, 480, 0, 1, 0 };
 
-// Time
+// Video & GL Feature Flags (All supported natively in Quest GLES 3.2)
+qboolean gl_texture_NPOT = qtrue;
+qboolean gl_glsl_alias_able = qtrue;
+qboolean gl_vbo_able = qtrue;
+qboolean gl_glsl_gamma_able = qtrue;
+qboolean gl_mtexable = qtrue;
+float gl_max_anisotropy = 4.0f;
+int gl_stencilbits = 8;
+
+cvar_t vid_gamma = {"gamma", "1.0", CVAR_ARCHIVE};
+cvar_t vid_contrast = {"contrast", "1.0", CVAR_ARCHIVE};
+cvar_t sys_throttle = {"sys_throttle", "0.0", 0};
+
+// Time & Sleep
 double Sys_DoubleTime(void) {
     struct timeval tp;
     struct timezone tzp;
     gettimeofday(&tp, &tzp);
     return (double)tp.tv_sec + (double)tp.tv_usec / 1000000.0;
+}
+
+void Sys_Sleep(unsigned long msecs) {
+    usleep(msecs * 1000);
 }
 
 // Print & Error
@@ -66,6 +62,10 @@ void Sys_Error(const char *error, ...) {
     va_end(ap);
     LOGE("SYS_ERROR: %s", buf);
     exit(1);
+}
+
+const char* Sys_ConsoleInput(void) {
+    return NULL;
 }
 
 // POSIX File I/O
@@ -122,13 +122,31 @@ int Sys_mkdir(const char *path) {
     return mkdir(path, 0777);
 }
 
-// Video / Input Stubs
+// Video / Framebuffer Stubs (Handled by OpenXR Swapchain)
+void VID_Init(void) {}
 void VID_Lock(void) {}
 void VID_Unlock(void) {}
+void GL_BeginRendering(int *x, int *y, int *width, int *height) {
+    if (x) *x = 0;
+    if (y) *y = 0;
+    if (width) *width = vid.width;
+    if (height) *height = vid.height;
+}
+void GL_EndRendering(void) {}
+
+// Input Stubs (Handled by OpenXR Touch Controller Bridge)
+void IN_Init(void) {}
+void IN_Commands(void) {}
 void IN_UpdateGrabs(void) {}
 void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
+
+// Sound DMA Stubs
+int SNDDMA_Init(void) { return 0; }
+void* SNDDMA_LockBuffer(void) { return NULL; }
+void SNDDMA_Submit(void) {}
+void SNDDMA_Shutdown(void) {}
 
 // VOIP Stubs
 void S_Voip_Transmit(unsigned char flags, sizebuf_t *sb) { (void)flags; (void)sb; }
