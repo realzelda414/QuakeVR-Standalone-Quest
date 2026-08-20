@@ -27,16 +27,18 @@ add_definitions(
     -DQUAKE_VR=1
     -DQUAKESPASM=1
     -DGLM_ENABLE_EXPERIMENTAL=1
+    -DGLEW_STATIC=1
+    -DGLEW_NO_GLU=1
 )
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -ffast-math -flto")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -O3 -ffast-math -flto -fexceptions -frtti")
 
-# Include paths
+# Include paths - place our local Quest compatibility headers first
 include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/vr
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${REPO_ROOT}/Quake
     ${REPO_ROOT}/src
     ${glm_SOURCE_DIR}
@@ -60,7 +62,7 @@ file(GLOB_RECURSE QUAKE_ROOT_SOURCES
     "${REPO_ROOT}/Quake/*.cpp"
 )
 
-# Exclude desktop-only platform backends (SDL, Windows drivers)
+# Exclude desktop-only platform backends
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "snd_sdl\\.(c|cpp)$")
