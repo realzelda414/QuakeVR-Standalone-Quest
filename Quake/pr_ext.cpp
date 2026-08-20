@@ -142,9 +142,9 @@ void PR_Markup_Begin(
         mu->mask = 0;
     }
     mu->txt = (const unsigned char*)text;
-    mu->tint.xyz = rgb;
+    mu->tint = qvec4(rgb[0], rgb[1], rgb[2], mu->tint[3]);
     mu->tint[3] = alpha;
-    mu->colour.xyz = rgb;
+    mu->colour = qvec4(rgb[0], rgb[1], rgb[2], mu->colour[3]);
     mu->colour[3] = alpha;
 }
 int PR_Markup_Parse(struct markup_s* mu)
