@@ -9,7 +9,7 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 // Quake Engine Declarations
-typedef struct quakeparms_s {
+typedef struct quakeparms_t {
     const char *basedir;
     const char *userdir;
     int argc;
