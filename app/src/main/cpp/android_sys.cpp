@@ -14,9 +14,7 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-extern "C" {
-
-// Standard Quake types
+// Forward declare engine types
 typedef int qboolean;
 #define qtrue 1
 #define qfalse 0
@@ -35,8 +33,8 @@ typedef struct {
     int recalc_refdef;
 } viddef_t;
 
-typedef struct usercmd_s usercmd_t;
-typedef struct sizebuf_s sizebuf_t;
+struct usercmd_t;
+struct sizebuf_t;
 
 // Global engine state
 qboolean isDedicated = qfalse;
@@ -128,11 +126,11 @@ int Sys_mkdir(const char *path) {
 void VID_Lock(void) {}
 void VID_Unlock(void) {}
 void IN_UpdateGrabs(void) {}
+void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
+void Sys_SendKeyEvents(void) {}
 
 // VOIP Stubs
 void S_Voip_Transmit(unsigned char flags, sizebuf_t *sb) { (void)flags; (void)sb; }
 void S_Voip_MapChange(void) {}
 void S_Voip_Parse(void) {}
-
-} // extern "C"
