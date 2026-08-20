@@ -35,7 +35,7 @@ add_definitions(
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -include unistd.h -O3 -ffast-math -flto")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -include unistd.h -O3 -ffast-math -flto -fexceptions -frtti")
 
-# Include paths - place our local Quest compatibility headers first
+# Include paths - local Quest compatibility headers first
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -63,14 +63,17 @@ file(GLOB_RECURSE QUAKE_ROOT_SOURCES
     "${REPO_ROOT}/Quake/*.cpp"
 )
 
-# Exclude desktop-only platform backends
+# Exclude desktop-only platform backends (SDL window, audio, input, Windows)
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "snd_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "in_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "gl_vidsdl\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "vid_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_win\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_win\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "in_win\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "vid_win\\.(c|cpp)$")
 
 # Build the main QuakeVR Quest shared library
 add_library(quakevr SHARED
