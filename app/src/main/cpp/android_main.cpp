@@ -1,4 +1,4 @@
-#include "quakedef.h"
+#include "../../../../Quake/quakedef.h"
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <unistd.h>
