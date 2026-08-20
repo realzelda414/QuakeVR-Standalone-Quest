@@ -29,7 +29,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -ffast-math -flto -Wno-format-security -
 get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../.." ABSOLUTE)
 set(QUAKE_SRC_DIR "${REPO_ROOT}/Quake")
 
-# Include Directories (REPO_ROOT allows <glm/...> to resolve immediately)
+# Include Directories
 include_directories(
     ${REPO_ROOT}
     ${REPO_ROOT}/glm
@@ -51,13 +51,18 @@ file(GLOB QUAKE_SOURCES
     ${QUAKE_SRC_DIR}/*.cpp
 )
 
-# Exclude desktop SDL driver sources (handled by android_sys.cpp & Quest OpenXR)
+# Exclude all Windows desktop and SDL desktop sources
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_win\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_win32\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_sdl.*\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*gl_vidsdl\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*snd_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*sys_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*cd_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*in_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*net_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*net_wins\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*net_wipx\\.(c|cpp)$")
 
 # Prebuilt OpenXR Loader from Quest SDK
 add_library(openxr_loader SHARED IMPORTED)
