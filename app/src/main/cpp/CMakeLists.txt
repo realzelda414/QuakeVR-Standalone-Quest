@@ -63,7 +63,8 @@ file(GLOB_RECURSE QUAKE_ROOT_SOURCES
     "${REPO_ROOT}/Quake/*.cpp"
 )
 
-# Exclude desktop and Windows-only platform backends
+# Exclude desktop, Windows-only backends, and directly-included source units
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "lodepng\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_sdl.*\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_sdl.*\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "snd_sdl.*\\.(c|cpp)$")
