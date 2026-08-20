@@ -91,101 +91,101 @@ cvar_t cl_voip_opus_bitrate = {"cl_voip_opus_bitrate", "0", 0, 0.0f, NULL};
 cvar_t cl_voip_send = {"cl_voip_send", "0", 0, 0.0f, NULL};
 
 // Time & Sleep
-double Sys_DoubleTime(void) {
-    struct timeval tp;
-    struct timezone tzp;
-    gettimeofday(&tp, &tzp);
-    return (double)tp.tv_sec + (double)tp.tv_usec / 1000000.0;
-}
+extern "C" {
+    double Sys_DoubleTime(void) {
+        struct timeval tp;
+        struct timezone tzp;
+        gettimeofday(&tp, &tzp);
+        return (double)tp.tv_sec + (double)tp.tv_usec / 1000000.0;
+    }
 
-void Sys_Sleep(unsigned long msecs) {
-    usleep(msecs * 1000);
-}
+    void Sys_Sleep(unsigned long msecs) {
+        usleep(msecs * 1000);
+    }
 
-// Print, Error & Quit
-void Sys_Printf(const char *fmt, ...) {
-    char buf[4096];
-    va_list ap;
-    va_start(ap, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, ap);
-    va_end(ap);
-    LOGI("%s", buf);
-}
+    void Sys_Printf(const char *fmt, ...) {
+        char buf[4096];
+        va_list ap;
+        va_start(ap, fmt);
+        vsnprintf(buf, sizeof(buf), fmt, ap);
+        va_end(ap);
+        LOGI("%s", buf);
+    }
 
-void Sys_Error(const char *error, ...) {
-    char buf[4096];
-    va_list ap;
-    va_start(ap, error);
-    vsnprintf(buf, sizeof(buf), error, ap);
-    va_end(ap);
-    LOGE("SYS_ERROR: %s", buf);
-    exit(1);
-}
+    void Sys_Error(const char *error, ...) {
+        char buf[4096];
+        va_list ap;
+        va_start(ap, error);
+        vsnprintf(buf, sizeof(buf), error, ap);
+        va_end(ap);
+        LOGE("SYS_ERROR: %s", buf);
+        exit(1);
+    }
 
-void Sys_Quit(void) {
-    exit(0);
-}
+    void Sys_Quit(void) {
+        exit(0);
+    }
 
-const char* Sys_ConsoleInput(void) {
-    return NULL;
-}
+    const char* Sys_ConsoleInput(void) {
+        return NULL;
+    }
 
-char* PL_GetClipboardData(void) {
-    return NULL;
-}
+    char* PL_GetClipboardData(void) {
+        return NULL;
+    }
 
-// POSIX File I/O
-int Sys_FileOpenRead(const char *path, int *hndl) {
-    int fd = open(path, O_RDONLY);
-    if (fd < 0) {
-        if (hndl) *hndl = -1;
+    int Sys_FileOpenRead(const char *path, int *hndl) {
+        int fd = open(path, O_RDONLY);
+        if (fd < 0) {
+            if (hndl) *hndl = -1;
+            return -1;
+        }
+        if (hndl) *hndl = fd;
+        struct stat st;
+        if (fstat(fd, &st) == 0) {
+            return (int)st.st_size;
+        }
+        return 0;
+    }
+
+    int Sys_FileOpenWrite(const char *path) {
+        return open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    }
+
+    int Sys_FileOpenStdio(FILE *stream) {
+        if (!stream) return -1;
+        return fileno(stream);
+    }
+
+    int Sys_FileRead(int handle, void *dest, int count) {
+        return (int)read(handle, dest, count);
+    }
+
+    int Sys_FileWrite(int handle, const void *data, int count) {
+        return (int)write(handle, data, count);
+    }
+
+    void Sys_FileClose(int handle) {
+        if (handle >= 0) {
+            close(handle);
+        }
+    }
+
+    void Sys_FileSeek(int handle, int position) {
+        lseek(handle, position, SEEK_SET);
+    }
+
+    int Sys_FileTime(const char *path) {
+        struct stat st;
+        if (stat(path, &st) >= 0) {
+            return (int)st.st_mtime;
+        }
         return -1;
     }
-    if (hndl) *hndl = fd;
-    struct stat st;
-    if (fstat(fd, &st) == 0) {
-        return (int)st.st_size;
+
+    int Sys_mkdir(const char *path) {
+        return mkdir(path, 0777);
     }
-    return 0;
-}
-
-int Sys_FileOpenWrite(const char *path) {
-    return open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-}
-
-int Sys_FileOpenStdio(FILE *stream) {
-    if (!stream) return -1;
-    return fileno(stream);
-}
-
-int Sys_FileRead(int handle, void *dest, int count) {
-    return (int)read(handle, dest, count);
-}
-
-int Sys_FileWrite(int handle, const void *data, int count) {
-    return (int)write(handle, data, count);
-}
-
-void Sys_FileClose(int handle) {
-    if (handle >= 0) {
-        close(handle);
-    }
-}
-
-void Sys_FileSeek(int handle, int position) {
-    lseek(handle, position, SEEK_SET);
-}
-
-int Sys_FileTime(const char *path) {
-    struct stat st;
-    if (stat(path, &st) >= 0) {
-        return (int)st.st_mtime;
-    }
-    return -1;
-}
-
-int Sys_mkdir(const char *path) {
-    return mkdir(path, 0777);
 }
 
 // Video / Framebuffer Stubs
@@ -213,7 +213,7 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA C++ Stubs
+// Sound DMA Stubs
 int SNDDMA_Init(struct dma_s *dma) { (void)dma; return 0; }
 int SNDDMA_Init(struct dma_t *dma) { (void)dma; return 0; }
 int SNDDMA_Init(void *dma) { (void)dma; return 0; }
