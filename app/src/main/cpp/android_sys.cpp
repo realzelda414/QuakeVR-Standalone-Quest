@@ -1,4 +1,3 @@
-#include "quakedef.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -15,7 +14,39 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Global engine state
+// Quake Types
+typedef int qboolean;
+#define qtrue 1
+#define qfalse 0
+
+#define CVAR_ARCHIVE 1
+
+typedef struct cvar_s {
+    const char *name;
+    const char *string;
+    int flags;
+    float value;
+    struct cvar_s *next;
+} cvar_t;
+
+typedef struct {
+    int width;
+    int height;
+    int colormask;
+    int rowbytes;
+    int pixelbytes;
+    int buffer;
+    int conwidth;
+    int conheight;
+    int direct;
+    int aspect;
+    int recalc_refdef;
+} viddef_t;
+
+struct usercmd_t;
+struct sizebuf_t;
+
+// Global Engine State
 qboolean isDedicated = qfalse;
 viddef_t vid = { 1920, 1080, 0, 1920 * 4, 4, 0, 640, 480, 0, 1, 0 };
 
@@ -28,9 +59,9 @@ qboolean gl_mtexable = qtrue;
 float gl_max_anisotropy = 4.0f;
 int gl_stencilbits = 8;
 
-cvar_t vid_gamma = {"gamma", "1.0", CVAR_ARCHIVE};
-cvar_t vid_contrast = {"contrast", "1.0", CVAR_ARCHIVE};
-cvar_t sys_throttle = {"sys_throttle", "0.0", 0};
+cvar_t vid_gamma = {"gamma", "1.0", CVAR_ARCHIVE, 1.0f, NULL};
+cvar_t vid_contrast = {"contrast", "1.0", CVAR_ARCHIVE, 1.0f, NULL};
+cvar_t sys_throttle = {"sys_throttle", "0.0", 0, 0.0f, NULL};
 
 // Time & Sleep
 double Sys_DoubleTime(void) {
