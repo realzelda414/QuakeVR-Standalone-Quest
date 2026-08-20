@@ -43,8 +43,19 @@ typedef struct {
     int recalc_refdef;
 } viddef_t;
 
+typedef struct dma_s {
+    int channels;
+    int samples;
+    int submission_chunk;
+    int samplepos;
+    int samplebits;
+    int speed;
+    unsigned char *buffer;
+} dma_t;
+
 struct usercmd_t;
 struct sizebuf_t;
+struct client_t;
 
 // Global Engine State
 qboolean isDedicated = qfalse;
@@ -56,6 +67,9 @@ qboolean gl_glsl_alias_able = qtrue;
 qboolean gl_vbo_able = qtrue;
 qboolean gl_glsl_gamma_able = qtrue;
 qboolean gl_mtexable = qtrue;
+qboolean gl_texture_env_combine = qtrue;
+qboolean gl_texture_env_add = qtrue;
+int gl_max_texture_units = 4;
 float gl_max_anisotropy = 4.0f;
 int gl_stencilbits = 8;
 
@@ -183,6 +197,7 @@ void VID_Lock(void) {}
 void VID_Unlock(void) {}
 void VID_Toggle(void) {}
 void VID_SyncCvars(void) {}
+void VID_SetWindowCaption(const char *caption) { (void)caption; }
 void GL_BeginRendering(int *x, int *y, int *width, int *height) {
     if (x) *x = 0;
     if (y) *y = 0;
@@ -201,15 +216,48 @@ void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
 // Sound DMA Stubs
+int SNDDMA_Init(dma_t *dma) { (void)dma; return 0; }
 int SNDDMA_Init(void) { return 0; }
+int SNDDMA_GetDMAPos(void) { return 0; }
+void SNDDMA_BlockSound(void) {}
+void SNDDMA_UnblockSound(void) {}
 void* SNDDMA_LockBuffer(void) { return NULL; }
 void SNDDMA_Submit(void) {}
 void SNDDMA_Shutdown(void) {}
 
-// VOIP Stubs
+// Client & Server VOIP Stubs
+void S_Voip_Init(void) {}
 void S_Voip_Transmit(unsigned char flags, sizebuf_t *sb) { (void)flags; (void)sb; }
 void S_Voip_MapChange(void) {}
 void S_Voip_Parse(void) {}
+float S_Voip_Loudness(bool incoming) { (void)incoming; return 0.0f; }
+bool S_Voip_Speaking(unsigned int client) { (void)client; return false; }
 
-// OpenVR Desktop SteamVR stub (bypassed on Quest OpenXR)
-extern "C" void VR_ShutdownInternal(void) {}
+void SV_VoiceInit(void) {}
+void SV_VoiceInitClient(client_t *cl) { (void)cl; }
+void SV_VoiceSendPacket(client_t *cl, sizebuf_t *msg) { (void)cl; (void)msg; }
+void SV_VoiceReadPacket(client_t *cl) { (void)cl; }
+
+// Desktop SteamVR OpenVR C-API Linker Stubs (Active VR is Meta OpenXR)
+extern "C" {
+    uint32_t VR_InitInternal2(void *peError, int eApplicationType, const char *pStartupInfo) {
+        (void)peError; (void)eApplicationType; (void)pStartupInfo;
+        return 0;
+    }
+    void VR_ShutdownInternal(void) {}
+    bool VR_IsInterfaceVersionValid(const char *pchInterfaceVersion) {
+        (void)pchInterfaceVersion;
+        return false;
+    }
+    void* VR_GetGenericInterface(const char *pchInterfaceVersion, void *peError) {
+        (void)pchInterfaceVersion; (void)peError;
+        return NULL;
+    }
+    uint32_t VR_GetInitToken(void) {
+        return 0;
+    }
+    const char* VR_GetVRInitErrorAsEnglishDescription(int error) {
+        (void)error;
+        return "OpenVR unsupported on Quest Standalone (Using OpenXR)";
+    }
+}
