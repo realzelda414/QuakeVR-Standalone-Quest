@@ -1,3 +1,4 @@
+#include "../../../../Quake/quakedef.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -14,64 +15,11 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Quake Types
-typedef int qboolean;
-#define qtrue 1
-#define qfalse 0
-
-#define CVAR_ARCHIVE 1
-
-typedef struct cvar_s {
-    const char *name;
-    const char *string;
-    int flags;
-    float value;
-    struct cvar_s *next;
-} cvar_t;
-
-typedef struct {
-    int width;
-    int height;
-    int colormask;
-    int rowbytes;
-    int pixelbytes;
-    int buffer;
-    int conwidth;
-    int conheight;
-    int direct;
-    int aspect;
-    int recalc_refdef;
-} viddef_t;
-
-struct dma_t {
-    int channels;
-    int samples;
-    int submission_chunk;
-    int samplepos;
-    int samplebits;
-    int speed;
-    unsigned char *buffer;
-};
-
-struct dma_s {
-    int channels;
-    int samples;
-    int submission_chunk;
-    int samplepos;
-    int samplebits;
-    int speed;
-    unsigned char *buffer;
-};
-
-struct usercmd_t;
-struct sizebuf_t;
-struct client_t;
-
 // Global Engine State
 qboolean isDedicated = qfalse;
 viddef_t vid = { 1920, 1080, 0, 1920 * 4, 4, 0, 640, 480, 0, 1, 0 };
 
-// Video & GL Feature Flags
+// Video & GL Feature Flags (Supported natively in Quest GLES 3.2)
 qboolean gl_texture_NPOT = qtrue;
 qboolean gl_glsl_alias_able = qtrue;
 qboolean gl_vbo_able = qtrue;
@@ -230,11 +178,8 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA Stubs (defining both struct tag manglings)
-int SNDDMA_Init(struct dma_t *dma) { (void)dma; return 0; }
-int SNDDMA_Init(struct dma_s *dma) { (void)dma; return 0; }
-int SNDDMA_Init(void *dma) { (void)dma; return 0; }
-int SNDDMA_Init(void) { return 0; }
+// Sound DMA Stubs (Exact dma_t signature from sound.h/quakedef.h)
+int SNDDMA_Init(dma_t *dma) { (void)dma; return 0; }
 int SNDDMA_GetDMAPos(void) { return 0; }
 void SNDDMA_BlockSound(void) {}
 void SNDDMA_UnblockSound(void) {}
