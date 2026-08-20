@@ -51,11 +51,13 @@ file(GLOB QUAKE_SOURCES
     ${QUAKE_SRC_DIR}/*.cpp
 )
 
-# Exclude desktop SDL video/sound sources (handled by android_sys.cpp & Quest OpenXR)
-list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*gl_vidsdl\\.cpp$")
-list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*snd_sdl\\.cpp$")
-list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*sys_sdl\\.cpp$")
-list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*cd_sdl\\.cpp$")
+# Exclude desktop SDL driver sources (handled by android_sys.cpp & Quest OpenXR)
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*gl_vidsdl\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*snd_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*sys_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*cd_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*in_sdl\\.(c|cpp)$")
+list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*net_sdl\\.(c|cpp)$")
 
 # Prebuilt OpenXR Loader from Quest SDK
 add_library(openxr_loader SHARED IMPORTED)
