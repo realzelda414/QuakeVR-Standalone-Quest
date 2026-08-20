@@ -11,6 +11,9 @@
     #include <EGL/egl.h>
     #include <EGL/eglext.h>
 
+    #define GLM_FORCE_SWIZZLE
+    #define GLM_ENABLE_EXPERIMENTAL
+
     #ifdef __cplusplus
     extern "C" {
     #endif
@@ -22,6 +25,9 @@
     #ifndef GLclampd
     typedef double GLclampd;
     #endif
+
+    // Depth Range alias for GLES3
+    #define glDepthRange(n, f) glDepthRangef((GLfloat)(n), (GLfloat)(f))
 
     // ARB Buffer & Texture aliases to standard GLES3
     #define glBindBufferARB glBindBuffer
@@ -69,6 +75,13 @@
     #define GL_PERSPECTIVE_CORRECTION_HINT 0x0C50
     #define GL_GENERATE_MIPMAP 0x8191
 
+    // Shading, Color Format, and Polygon Offset constants
+    #define GL_FLAT 0x1D00
+    #define GL_SMOOTH 0x1D01
+    #define GL_BGRA 0x80E1
+    #define GL_POLYGON_OFFSET_LINE 0x2A02
+    #define GL_POLYGON_OFFSET_POINT 0x2A01
+
     // Legacy Stubs for Immediate Mode Calls
     inline void glBegin(GLenum mode) { (void)mode; }
     inline void glEnd(void) {}
@@ -102,6 +115,7 @@
     inline void glFogf(GLenum pname, GLfloat param) { (void)pname; (void)param; }
     inline void glFogi(GLenum pname, GLint param) { (void)pname; (void)param; }
     inline void glFogfv(GLenum pname, const GLfloat* params) { (void)pname; (void)params; }
+    inline void glShadeModel(GLenum mode) { (void)mode; }
     inline void glPolygonMode(GLenum face, GLenum mode) { (void)face; (void)mode; }
     #define GL_POINT 0x1B00
     #define GL_LINE 0x1B01
