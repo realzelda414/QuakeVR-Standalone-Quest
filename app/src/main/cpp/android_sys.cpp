@@ -9,7 +9,6 @@
 #include <string.h>
 #include <errno.h>
 #include <android/log.h>
-#include <android_native_app_glue.h>
 
 #define LOG_TAG "QuakeVR-Sys"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -44,16 +43,8 @@ typedef struct {
     int recalc_refdef;
 } viddef_t;
 
-typedef struct dma_s {
-    int channels;
-    int samples;
-    int submission_chunk;
-    int samplepos;
-    int samplebits;
-    int speed;
-    unsigned char *buffer;
-} dma_t;
-
+struct dma_s;
+typedef struct dma_s dma_t;
 struct usercmd_t;
 struct sizebuf_t;
 struct client_t;
@@ -98,7 +89,7 @@ cvar_t cl_voip_autogain = {"cl_voip_autogain", "0", 0, 0.0f, NULL};
 cvar_t cl_voip_opus_bitrate = {"cl_voip_opus_bitrate", "0", 0, 0.0f, NULL};
 cvar_t cl_voip_send = {"cl_voip_send", "0", 0, 0.0f, NULL};
 
-// Time & Sleep (Standard C++ Linkage)
+// Time & Sleep (C++ Linkage)
 double Sys_DoubleTime(void) {
     struct timeval tp;
     struct timezone tzp;
@@ -221,7 +212,7 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA Stubs
+// Sound DMA C++ Stubs
 int SNDDMA_Init(dma_t *dma) { (void)dma; return 0; }
 int SNDDMA_GetDMAPos(void) { return 0; }
 void SNDDMA_BlockSound(void) {}
@@ -243,7 +234,7 @@ void SV_VoiceInitClient(client_t *cl) { (void)cl; }
 void SV_VoiceSendPacket(client_t *cl, sizebuf_t *msg) { (void)cl; (void)msg; }
 void SV_VoiceReadPacket(client_t *cl) { (void)cl; }
 
-// OpenVR Desktop SteamVR C-API Linker Stubs (Quest uses OpenXR)
+// OpenVR Desktop SteamVR Linker Stubs
 extern "C" {
     uint32_t VR_InitInternal2(void *peError, int eApplicationType, const char *pStartupInfo) {
         (void)peError; (void)eApplicationType; (void)pStartupInfo;
