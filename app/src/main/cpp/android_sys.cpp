@@ -43,8 +43,26 @@ typedef struct {
     int recalc_refdef;
 } viddef_t;
 
-struct dma_s;
-typedef struct dma_s dma_t;
+struct dma_t {
+    int channels;
+    int samples;
+    int submission_chunk;
+    int samplepos;
+    int samplebits;
+    int speed;
+    unsigned char *buffer;
+};
+
+struct dma_s {
+    int channels;
+    int samples;
+    int submission_chunk;
+    int samplepos;
+    int samplebits;
+    int speed;
+    unsigned char *buffer;
+};
+
 struct usercmd_t;
 struct sizebuf_t;
 struct client_t;
@@ -53,7 +71,7 @@ struct client_t;
 qboolean isDedicated = qfalse;
 viddef_t vid = { 1920, 1080, 0, 1920 * 4, 4, 0, 640, 480, 0, 1, 0 };
 
-// Video & GL Feature Flags (All supported natively in Quest GLES 3.2)
+// Video & GL Feature Flags
 qboolean gl_texture_NPOT = qtrue;
 qboolean gl_glsl_alias_able = qtrue;
 qboolean gl_vbo_able = qtrue;
@@ -89,7 +107,7 @@ cvar_t cl_voip_autogain = {"cl_voip_autogain", "0", 0, 0.0f, NULL};
 cvar_t cl_voip_opus_bitrate = {"cl_voip_opus_bitrate", "0", 0, 0.0f, NULL};
 cvar_t cl_voip_send = {"cl_voip_send", "0", 0, 0.0f, NULL};
 
-// Time & Sleep (C++ Linkage)
+// Time & Sleep
 double Sys_DoubleTime(void) {
     struct timeval tp;
     struct timezone tzp;
@@ -212,8 +230,11 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA C++ Stubs
-int SNDDMA_Init(dma_t *dma) { (void)dma; return 0; }
+// Sound DMA Stubs (defining both struct tag manglings)
+int SNDDMA_Init(struct dma_t *dma) { (void)dma; return 0; }
+int SNDDMA_Init(struct dma_s *dma) { (void)dma; return 0; }
+int SNDDMA_Init(void *dma) { (void)dma; return 0; }
+int SNDDMA_Init(void) { return 0; }
 int SNDDMA_GetDMAPos(void) { return 0; }
 void SNDDMA_BlockSound(void) {}
 void SNDDMA_UnblockSound(void) {}
