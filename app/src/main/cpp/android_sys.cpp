@@ -49,15 +49,8 @@ struct dma_s;
 struct usercmd_t;
 struct sizebuf_t;
 struct client_t;
-
-typedef struct quakeparms_s {
-    const char *basedir;
-    const char *userdir;
-    int argc;
-    char **argv;
-    void *membase;
-    int memsize;
-} quakeparms_t;
+struct quakeparms_t;
+struct quakeparms_s;
 
 // Global Engine State
 qboolean isDedicated = qfalse;
@@ -222,19 +215,17 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA Stubs (C and C++ overload coverage)
-extern "C" {
-    int SNDDMA_Init(void *dma) { (void)dma; return 0; }
-    int SNDDMA_GetDMAPos(void) { return 0; }
-    void SNDDMA_BlockSound(void) {}
-    void SNDDMA_UnblockSound(void) {}
-    void* SNDDMA_LockBuffer(void) { return NULL; }
-    void SNDDMA_Submit(void) {}
-    void SNDDMA_Shutdown(void) {}
-}
-
+// Sound DMA C++ Stubs
 int SNDDMA_Init(struct dma_s *dma) { (void)dma; return 0; }
 int SNDDMA_Init(struct dma_t *dma) { (void)dma; return 0; }
+int SNDDMA_Init(void *dma) { (void)dma; return 0; }
+int SNDDMA_Init(void) { return 0; }
+int SNDDMA_GetDMAPos(void) { return 0; }
+void SNDDMA_BlockSound(void) {}
+void SNDDMA_UnblockSound(void) {}
+void* SNDDMA_LockBuffer(void) { return NULL; }
+void SNDDMA_Submit(void) {}
+void SNDDMA_Shutdown(void) {}
 
 // Client & Server VOIP Stubs
 void S_Voip_Init(void) {}
@@ -248,6 +239,12 @@ void SV_VoiceInit(void) {}
 void SV_VoiceInitClient(client_t *cl) { (void)cl; }
 void SV_VoiceSendPacket(client_t *cl, sizebuf_t *msg) { (void)cl; (void)msg; }
 void SV_VoiceReadPacket(client_t *cl) { (void)cl; }
+
+// Forward declarations of Quake's engine functions in host.cpp
+extern void Host_Init(struct quakeparms_t *parms);
+void Host_Init(struct quakeparms_s *parms) {
+    Host_Init((struct quakeparms_t*)parms);
+}
 
 // OpenVR Desktop SteamVR Stubs
 extern "C" {
