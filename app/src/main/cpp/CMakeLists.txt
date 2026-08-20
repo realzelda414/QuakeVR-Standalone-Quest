@@ -63,7 +63,7 @@ file(GLOB_RECURSE QUAKE_ROOT_SOURCES
     "${REPO_ROOT}/Quake/*.cpp"
 )
 
-# Exclude desktop-only platform backends (SDL window, audio, input, Windows)
+# Exclude desktop and Windows-only platform backends
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_sdl\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "snd_sdl\\.(c|cpp)$")
@@ -74,6 +74,10 @@ list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "sys_win\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "cd_win\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "in_win\\.(c|cpp)$")
 list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "vid_win\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "snd_win\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "net_win\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "net_wins\\.(c|cpp)$")
+list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "net_wipx\\.(c|cpp)$")
 
 # Build the main QuakeVR Quest shared library
 add_library(quakevr SHARED
