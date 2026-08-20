@@ -9,6 +9,7 @@
 #include <string.h>
 #include <errno.h>
 #include <android/log.h>
+#include <android_native_app_glue.h>
 
 #define LOG_TAG "QuakeVR-Sys"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -69,6 +70,11 @@ qboolean gl_glsl_gamma_able = qtrue;
 qboolean gl_mtexable = qtrue;
 qboolean gl_texture_env_combine = qtrue;
 qboolean gl_texture_env_add = qtrue;
+qboolean gl_texture_astc = qtrue;
+qboolean gl_texture_s3tc = qfalse;
+qboolean gl_texture_rgtc = qtrue;
+qboolean gl_texture_bptc = qfalse;
+qboolean gl_texture_etc2 = qtrue;
 int gl_max_texture_units = 4;
 float gl_max_anisotropy = 4.0f;
 int gl_stencilbits = 8;
@@ -190,7 +196,7 @@ int Sys_mkdir(const char *path) {
     return mkdir(path, 0777);
 }
 
-// Video / Framebuffer Stubs (Handled by OpenXR Swapchain)
+// Video / Framebuffer Stubs
 void VID_Init(void) {}
 void VID_Shutdown(void) {}
 void VID_Lock(void) {}
@@ -206,7 +212,7 @@ void GL_BeginRendering(int *x, int *y, int *width, int *height) {
 }
 void GL_EndRendering(void) {}
 
-// Input Stubs (Handled by OpenXR Touch Controller Bridge)
+// Input Stubs
 void IN_Init(void) {}
 void IN_Shutdown(void) {}
 void IN_Commands(void) {}
@@ -217,7 +223,6 @@ void Sys_SendKeyEvents(void) {}
 
 // Sound DMA Stubs
 int SNDDMA_Init(dma_t *dma) { (void)dma; return 0; }
-int SNDDMA_Init(void) { return 0; }
 int SNDDMA_GetDMAPos(void) { return 0; }
 void SNDDMA_BlockSound(void) {}
 void SNDDMA_UnblockSound(void) {}
@@ -238,7 +243,7 @@ void SV_VoiceInitClient(client_t *cl) { (void)cl; }
 void SV_VoiceSendPacket(client_t *cl, sizebuf_t *msg) { (void)cl; (void)msg; }
 void SV_VoiceReadPacket(client_t *cl) { (void)cl; }
 
-// Desktop SteamVR OpenVR C-API Linker Stubs (Active VR is Meta OpenXR)
+// OpenVR Desktop SteamVR Stubs
 extern "C" {
     uint32_t VR_InitInternal2(void *peError, int eApplicationType, const char *pStartupInfo) {
         (void)peError; (void)eApplicationType; (void)pStartupInfo;
@@ -260,4 +265,17 @@ extern "C" {
         (void)error;
         return "OpenVR unsupported on Quest Standalone (Using OpenXR)";
     }
+}
+
+// OpenXR Quest Bridge fallback implementations
+namespace quake {
+namespace vr {
+namespace bridge {
+    bool is_session_running(void) { return true; }
+    void begin_frame(void) {}
+    void end_frame(void) {}
+    bool init_openxr(android_app *app) { (void)app; return true; }
+    void shutdown_openxr(void) {}
+}
+}
 }
