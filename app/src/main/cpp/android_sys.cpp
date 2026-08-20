@@ -49,8 +49,6 @@ struct dma_s;
 struct usercmd_t;
 struct sizebuf_t;
 struct client_t;
-struct quakeparms_t;
-struct quakeparms_s;
 
 // Global Engine State
 qboolean isDedicated = qfalse;
@@ -239,12 +237,6 @@ void SV_VoiceInit(void) {}
 void SV_VoiceInitClient(client_t *cl) { (void)cl; }
 void SV_VoiceSendPacket(client_t *cl, sizebuf_t *msg) { (void)cl; (void)msg; }
 void SV_VoiceReadPacket(client_t *cl) { (void)cl; }
-
-// Forward declarations of Quake's engine functions in host.cpp
-extern void Host_Init(struct quakeparms_t *parms);
-void Host_Init(struct quakeparms_s *parms) {
-    Host_Init((struct quakeparms_t*)parms);
-}
 
 // OpenVR Desktop SteamVR Stubs
 extern "C" {
