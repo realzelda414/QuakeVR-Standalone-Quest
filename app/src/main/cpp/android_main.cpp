@@ -8,20 +8,22 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Quake Engine Struct & Declarations matching Quake/quakedef.h
-struct quakeparms_s {
+// Quake Engine Declarations (C Linkage)
+typedef struct quakeparms_s {
     const char *basedir;
     const char *userdir;
     int argc;
     char **argv;
     void *membase;
     int memsize;
-};
+} quakeparms_t;
 
-extern void _Host_Frame(double time);
-extern void Host_Init(struct quakeparms_s *parms);
-extern void Host_Shutdown(void);
-extern double Sys_DoubleTime(void);
+extern "C" {
+    void Host_Init(quakeparms_t *parms);
+    void _Host_Frame(double time);
+    void Host_Shutdown(void);
+    double Sys_DoubleTime(void);
+}
 
 // OpenXR Bridge Declarations
 namespace quake {
@@ -58,7 +60,7 @@ static void on_app_cmd(struct android_app *app, int32_t cmd) {
                         "+vr_movement_mode", "1"
                     };
 
-                    static struct quakeparms_s parms;
+                    static quakeparms_t parms;
                     memset(&parms, 0, sizeof(parms));
                     parms.basedir = "/sdcard/QuakeVR";
                     parms.userdir = "/sdcard/QuakeVR";
