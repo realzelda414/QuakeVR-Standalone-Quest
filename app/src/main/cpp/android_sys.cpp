@@ -1,4 +1,4 @@
-#include "quakedef.h"
+#include "../../../../Quake/quakedef.h"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
