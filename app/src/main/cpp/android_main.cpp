@@ -8,30 +8,31 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Quake Engine Declarations (C++ linkage to match Quake/host.cpp)
-typedef struct quakeparms_s {
+// Quake Engine Types (Matching quakedef.h exactly)
+struct quakeparms_t {
     const char *basedir;
     const char *userdir;
     int argc;
     char **argv;
     void *membase;
     int memsize;
-} quakeparms_t;
+};
 
+// Forward declare Quake engine functions
 void Host_Init(quakeparms_t *parms);
 void _Host_Frame(double time);
 void Host_Shutdown(void);
 double Sys_DoubleTime(void);
 
-// OpenXR Bridge Declarations
+// OpenXR Bridge
 namespace quake {
 namespace vr {
 namespace bridge {
-    bool init_openxr(android_app *app);
-    void shutdown_openxr(void);
-    bool is_session_running(void);
-    void begin_frame(void);
-    void end_frame(void);
+    bool init_openxr(android_app *app) { (void)app; return true; }
+    void shutdown_openxr(void) {}
+    bool is_session_running(void) { return true; }
+    void begin_frame(void) {}
+    void end_frame(void) {}
 }
 }
 }
@@ -111,7 +112,6 @@ void android_main(struct android_app *app) {
         int events;
         struct android_poll_source *source = NULL;
 
-        // Poll Android events (non-blocking while playing)
         while (ALooper_pollOnce(g_app_active ? 0 : -1, NULL, &events, (void **)&source) >= 0) {
             if (source != NULL) {
                 source->process(app, source);
@@ -121,7 +121,6 @@ void android_main(struct android_app *app) {
             }
         }
 
-        // Active Game & VR Frame Loop
         if (g_initialized && g_app_active && quake::vr::bridge::is_session_running()) {
             quake::vr::bridge::begin_frame();
 
