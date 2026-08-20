@@ -87,6 +87,7 @@ list(FILTER QUAKE_ROOT_SOURCES EXCLUDE REGEX "net_wipx.*\\.(c|cpp)$")
 add_library(quakevr SHARED
     ${QUAKE_ROOT_SOURCES}
     android_main.cpp
+    android_sys.cpp
     vr/quakevr_bridge.cpp
 )
 
