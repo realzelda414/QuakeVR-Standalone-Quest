@@ -11,8 +11,12 @@
     #include <EGL/egl.h>
     #include <EGL/eglext.h>
 
+    #ifndef GLM_FORCE_SWIZZLE
     #define GLM_FORCE_SWIZZLE
+    #endif
+    #ifndef GLM_ENABLE_EXPERIMENTAL
     #define GLM_ENABLE_EXPERIMENTAL
+    #endif
 
     #ifdef __cplusplus
     extern "C" {
@@ -81,6 +85,40 @@
     #define GL_BGRA 0x80E1
     #define GL_POLYGON_OFFSET_LINE 0x2A02
     #define GL_POLYGON_OFFSET_POINT 0x2A01
+    #define GL_POINT_SMOOTH 0x0B10
+    #define GL_LINE_SMOOTH 0x0B20
+
+    // Texture Formats and Compressed Formats
+    #define GL_UNSIGNED_INT_8_8_8_8_REV 0x8367
+    #define GL_UNSIGNED_INT_8_8_8_8 0x8035
+    #define GL_LUMINANCE8 0x8040
+    #define GL_LUMINANCE8_ALPHA8 0x8045
+    #define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT 0x83F1
+    #define GL_COMPRESSED_RGB_S3TC_DXT1_EXT 0x83F0
+    #define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT 0x83F2
+    #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT 0x83F3
+    #define GL_COMPRESSED_RED_RGTC1 0x8DBB
+    #define GL_COMPRESSED_SIGNED_RED_RGTC1 0x8DBC
+    #define GL_COMPRESSED_RG_RGTC2 0x8DBD
+    #define GL_COMPRESSED_SIGNED_RG_RGTC2 0x8DBE
+    #define GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT 0x8E8E
+    #define GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT 0x8E8F
+    #define GL_COMPRESSED_RGBA_BPTC_UNORM 0x8E8C
+    #define GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM 0x8E8D
+    #define GL_COMPRESSED_RGBA_ASTC_4x4_KHR 0x93B0
+    #define GL_COMPRESSED_RGBA_ASTC_5x4_KHR 0x93B1
+    #define GL_COMPRESSED_RGBA_ASTC_5x5_KHR 0x93B2
+    #define GL_COMPRESSED_RGBA_ASTC_6x5_KHR 0x93B3
+    #define GL_COMPRESSED_RGBA_ASTC_6x6_KHR 0x93B4
+    #define GL_COMPRESSED_RGBA_ASTC_8x5_KHR 0x93B5
+    #define GL_COMPRESSED_RGBA_ASTC_8x6_KHR 0x93B6
+    #define GL_COMPRESSED_RGBA_ASTC_8x8_KHR 0x93B7
+    #define GL_COMPRESSED_RGBA_ASTC_10x5_KHR 0x93B8
+    #define GL_COMPRESSED_RGBA_ASTC_10x6_KHR 0x93B9
+    #define GL_COMPRESSED_RGBA_ASTC_10x8_KHR 0x93BA
+    #define GL_COMPRESSED_RGBA_ASTC_10x10_KHR 0x93BB
+    #define GL_COMPRESSED_RGBA_ASTC_12x10_KHR 0x93BC
+    #define GL_COMPRESSED_RGBA_ASTC_12x12_KHR 0x93BD
 
     // Legacy Stubs for Immediate Mode Calls
     inline void glBegin(GLenum mode) { (void)mode; }
@@ -117,6 +155,7 @@
     inline void glFogfv(GLenum pname, const GLfloat* params) { (void)pname; (void)params; }
     inline void glShadeModel(GLenum mode) { (void)mode; }
     inline void glPolygonMode(GLenum face, GLenum mode) { (void)face; (void)mode; }
+    inline void glPointSize(GLfloat size) { (void)size; }
     #define GL_POINT 0x1B00
     #define GL_LINE 0x1B01
     #define GL_FILL 0x1B02
