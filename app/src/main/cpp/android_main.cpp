@@ -1,4 +1,3 @@
-#include "../../../../Quake/quakedef.h"
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <unistd.h>
@@ -8,6 +7,21 @@
 #define LOG_TAG "QuakeVR-Main"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
+// Quake Engine Parameter Struct & Function Declarations
+typedef struct quakeparms_s {
+    const char *basedir;
+    const char *userdir;
+    int argc;
+    char **argv;
+    void *membase;
+    int memsize;
+} quakeparms_t;
+
+void Host_Init(quakeparms_t *parms);
+void _Host_Frame(double time);
+void Host_Shutdown(void);
+double Sys_DoubleTime(void);
 
 // OpenXR Bridge Declarations
 namespace quake {
