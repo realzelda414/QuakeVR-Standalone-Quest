@@ -25,19 +25,18 @@ add_definitions(
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -flto -fexceptions -frtti -Wno-format-security -Wno-error -Wno-deprecated-volatile")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -ffast-math -flto -Wno-format-security -Wno-error")
 
-# Locate Quake and Project Root Paths
-set(PROJ_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../..)
-set(QUAKE_SRC_DIR ${PROJ_ROOT}/Quake)
+# Absolute path to repository root: QuakeVR-Standalone-Quest/
+get_filename_component(REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../.." ABSOLUTE)
+set(QUAKE_SRC_DIR "${REPO_ROOT}/Quake")
 
-# Include Directories (Including GLM and all headers)
+# Include Directories (REPO_ROOT allows <glm/...> to resolve immediately)
 include_directories(
+    ${REPO_ROOT}
+    ${REPO_ROOT}/glm
+    ${QUAKE_SRC_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/vr
-    ${QUAKE_SRC_DIR}
-    ${PROJ_ROOT}
-    ${PROJ_ROOT}/include
-    ${PROJ_ROOT}/src
     ${ANDROID_NDK}/sources/android/native_app_glue
 )
 
