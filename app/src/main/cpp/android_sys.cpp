@@ -9,7 +9,6 @@
 #include <string.h>
 #include <errno.h>
 #include <android/log.h>
-#include <android_native_app_glue.h>
 
 #define LOG_TAG "QuakeVR-Sys"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
@@ -45,19 +44,9 @@ typedef struct {
 } viddef_t;
 
 struct dma_t;
-struct dma_s;
 struct usercmd_t;
 struct sizebuf_t;
 struct client_t;
-
-typedef struct quakeparms_s {
-    const char *basedir;
-    const char *userdir;
-    int argc;
-    char **argv;
-    void *membase;
-    int memsize;
-} quakeparms_t;
 
 // Global Engine State
 qboolean isDedicated = qfalse;
@@ -223,8 +212,7 @@ void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
 // Sound DMA Stubs
-int SNDDMA_Init(struct dma_t *dma) { (void)dma; return 0; }
-int SNDDMA_Init(struct dma_s *dma) { (void)dma; return 0; }
+int SNDDMA_Init(void *dma) { (void)dma; return 0; }
 int SNDDMA_Init(void) { return 0; }
 int SNDDMA_GetDMAPos(void) { return 0; }
 void SNDDMA_BlockSound(void) {}
@@ -246,31 +234,7 @@ void SV_VoiceInitClient(client_t *cl) { (void)cl; }
 void SV_VoiceSendPacket(client_t *cl, sizebuf_t *msg) { (void)cl; (void)msg; }
 void SV_VoiceReadPacket(client_t *cl) { (void)cl; }
 
-// Forward declarations of Quake's engine functions in host.cpp
-extern void Host_Init(quakeparms_t *parms);
-extern void _Host_Frame(double time);
-extern void Host_Shutdown(void);
-
-// Overloads/wrappers for android_main callers
-void Host_Init(int argc, char **argv) {
-    static quakeparms_t parms;
-    memset(&parms, 0, sizeof(parms));
-    parms.basedir = "/sdcard/QuakeVR";
-    parms.userdir = "/sdcard/QuakeVR";
-    parms.argc = argc;
-    parms.argv = argv;
-    Host_Init(&parms);
-}
-
-void Host_Frame(void) {
-    static double oldtime = 0.0;
-    double newtime = Sys_DoubleTime();
-    double time = (oldtime == 0.0) ? 0.1 : (newtime - oldtime);
-    oldtime = newtime;
-    _Host_Frame(time);
-}
-
-// OpenVR Desktop SteamVR Stubs
+// Desktop SteamVR OpenVR Stubs
 extern "C" {
     uint32_t VR_InitInternal2(void *peError, int eApplicationType, const char *pStartupInfo) {
         (void)peError; (void)eApplicationType; (void)pStartupInfo;
