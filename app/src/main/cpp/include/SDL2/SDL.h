@@ -87,6 +87,11 @@ inline SDL_bool SDL_GetRelativeMouseMode(void) {
     return (SDL_bool)0;
 }
 
+inline int SDL_GL_SetSwapInterval(int interval) {
+    (void)interval;
+    return 0;
+}
+
 inline SDL_AudioDeviceID SDL_OpenAudioDevice(const char *device, int iscapture, const SDL_AudioSpec *desired, SDL_AudioSpec *obtained, int allowed_changes) {
     (void)device; (void)iscapture; (void)desired; (void)obtained; (void)allowed_changes;
     return 0;
