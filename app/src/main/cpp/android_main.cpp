@@ -1,6 +1,3 @@
-#include "common.hpp"
-#include "host.hpp"
-#include "sys.hpp"
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <unistd.h>
@@ -11,6 +8,24 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
+// Quake Engine Parameter Structure (Both tags defined for exact linkage)
+struct quakeparms_t {
+    const char *basedir;
+    const char *userdir;
+    int argc;
+    char **argv;
+    void *membase;
+    int memsize;
+};
+typedef struct quakeparms_t quakeparms_s;
+
+// Engine Host function prototypes
+void Host_Init(struct quakeparms_t *parms);
+void Host_Frame(double time);
+void Host_Shutdown(void);
+double Sys_DoubleTime(void);
+
+// OpenXR Bridge Declarations
 namespace quake {
 namespace vr {
 namespace bridge {
@@ -45,13 +60,13 @@ static void on_app_cmd(struct android_app *app, int32_t cmd) {
                         "+vr_movement_mode", "1"
                     };
 
-                    static quakeparms_t parms;
+                    static struct quakeparms_t parms;
                     memset(&parms, 0, sizeof(parms));
                     parms.basedir = "/sdcard/QuakeVR";
                     parms.userdir = "/sdcard/QuakeVR";
                     parms.argc = sizeof(args) / sizeof(args[0]);
                     parms.argv = (char**)args;
-                    parms.memsize = 128 * 1024 * 1024;
+                    parms.memsize = 128 * 1024 * 1024; // 128MB heap
                     parms.membase = malloc(parms.memsize);
 
                     LOGI("Calling Quake Engine Host_Init...");
