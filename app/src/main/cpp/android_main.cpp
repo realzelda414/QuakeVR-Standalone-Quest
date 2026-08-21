@@ -1,3 +1,6 @@
+#include "quakedef.hpp"
+#include "host.hpp"
+#include "sys.hpp"
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <unistd.h>
@@ -7,25 +10,6 @@
 #define LOG_TAG "QuakeVR-Main"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
-
-// Quake Engine Parameter Structure
-struct quakeparms_s {
-    const char *basedir;
-    const char *userdir;
-    int argc;
-    char **argv;
-    void *membase;
-    int memsize;
-};
-typedef struct quakeparms_s quakeparms_t;
-
-// Quake Core Host and System Functions (Declared with extern "C" linkage to match host.cpp export)
-extern "C" {
-    void Host_Init(quakeparms_t *parms);
-    void Host_Frame(double time);
-    void Host_Shutdown(void);
-    double Sys_DoubleTime(void);
-}
 
 // OpenXR Bridge Declarations
 namespace quake {
