@@ -1,4 +1,6 @@
-#include "quakedef.hpp"
+#include "common.hpp"
+#include "host.hpp"
+#include "sys.hpp"
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <unistd.h>
@@ -9,7 +11,6 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// OpenXR Bridge Declarations
 namespace quake {
 namespace vr {
 namespace bridge {
@@ -50,7 +51,7 @@ static void on_app_cmd(struct android_app *app, int32_t cmd) {
                     parms.userdir = "/sdcard/QuakeVR";
                     parms.argc = sizeof(args) / sizeof(args[0]);
                     parms.argv = (char**)args;
-                    parms.memsize = 128 * 1024 * 1024; // 128MB heap
+                    parms.memsize = 128 * 1024 * 1024;
                     parms.membase = malloc(parms.memsize);
 
                     LOGI("Calling Quake Engine Host_Init...");
