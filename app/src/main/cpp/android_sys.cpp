@@ -22,15 +22,15 @@ typedef int qboolean;
 
 #define CVAR_ARCHIVE 1
 
-typedef struct cvar_s {
+typedef struct cvar_t {
     const char *name;
     const char *string;
     int flags;
     float value;
-    struct cvar_s *next;
+    struct cvar_t *next;
 } cvar_t;
 
-typedef struct {
+typedef struct viddef_t {
     int width;
     int height;
     int colormask;
@@ -44,7 +44,7 @@ typedef struct {
     int recalc_refdef;
 } viddef_t;
 
-typedef struct dma_s {
+typedef struct dma_t {
     int channels;
     int samples;
     int submission_chunk;
@@ -221,7 +221,7 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA Stubs
+// Sound DMA Stubs (Exact struct dma_t matching snd_dma.cpp)
 int SNDDMA_Init(dma_t *dma) { (void)dma; return 0; }
 int SNDDMA_GetDMAPos(void) { return 0; }
 void SNDDMA_BlockSound(void) {}
