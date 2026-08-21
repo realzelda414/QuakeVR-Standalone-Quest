@@ -1,4 +1,3 @@
-#include "common.hpp"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -9,11 +8,51 @@
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
+#include <stdint.h>
 #include <android/log.h>
 
 #define LOG_TAG "QuakeVR-Sys"
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
+
+// Quake Core Primitive Types
+typedef int qboolean;
+#define qtrue 1
+#define qfalse 0
+
+#define CVAR_ARCHIVE 1
+
+typedef struct cvar_s {
+    const char *name;
+    const char *string;
+    int flags;
+    float value;
+    struct cvar_s *next;
+} cvar_t;
+
+typedef struct {
+    int width;
+    int height;
+    int colormask;
+    int rowbytes;
+    int pixelbytes;
+    int buffer;
+    int conwidth;
+    int conheight;
+    int direct;
+    int aspect;
+    int recalc_refdef;
+} viddef_t;
+
+typedef struct dma_s {
+    int channels;
+    int samples;
+    int submission_chunk;
+    int samplepos;
+    int samplebits;
+    int speed;
+    unsigned char *buffer;
+} dma_t;
 
 struct usercmd_t;
 struct sizebuf_t;
