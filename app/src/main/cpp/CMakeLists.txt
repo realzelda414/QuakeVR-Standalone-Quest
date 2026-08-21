@@ -84,4 +84,5 @@ target_link_libraries(quakevr
     m
     z
     atomic
+    dl
 )
