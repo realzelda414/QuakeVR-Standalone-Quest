@@ -8,8 +8,8 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Quake Engine Parameter Struct & Function Declarations
-typedef struct quakeparms_s {
+// Quake Engine Parameter Struct (Tagged as quakeparms_t to match host.cpp exactly)
+typedef struct quakeparms_t {
     const char *basedir;
     const char *userdir;
     int argc;
@@ -18,6 +18,7 @@ typedef struct quakeparms_s {
     int memsize;
 } quakeparms_t;
 
+// Quake Host Engine Declarations
 void Host_Init(quakeparms_t *parms);
 void Host_Frame(double time);
 void Host_Shutdown(void);
