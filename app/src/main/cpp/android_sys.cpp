@@ -1,4 +1,4 @@
-#include "quakedef.h"
+#include "common.hpp"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -15,6 +15,11 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
+struct usercmd_t;
+struct sizebuf_t;
+struct client_t;
+
+// Global Engine State
 qboolean isDedicated = qfalse;
 viddef_t vid = { 1920, 1080, 0, 1920 * 4, 4, 0, 640, 480, 0, 1, 0 };
 
@@ -177,7 +182,7 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA Stub (Single definition)
+// Sound DMA Stubs
 int SNDDMA_Init(dma_t *dma) { (void)dma; return 0; }
 int SNDDMA_GetDMAPos(void) { return 0; }
 void SNDDMA_BlockSound(void) {}
