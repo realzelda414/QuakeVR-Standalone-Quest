@@ -1,4 +1,9 @@
-#include "quakedef.hpp"
+#include "common.hpp"
+#include "host.hpp"
+#include "sys.hpp"
+#include "vid.hpp"
+#include "sound.hpp"
+#include "cvar.hpp"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
