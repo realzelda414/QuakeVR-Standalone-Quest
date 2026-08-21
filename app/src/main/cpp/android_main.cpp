@@ -1,5 +1,3 @@
-#include "common.hpp"
-#include "host.hpp"
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <unistd.h>
