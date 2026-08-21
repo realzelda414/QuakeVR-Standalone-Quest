@@ -10,6 +10,21 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
+// Quake Engine Parameter Struct & Function Declarations
+typedef struct quakeparms_s {
+    const char *basedir;
+    const char *userdir;
+    int argc;
+    char **argv;
+    void *membase;
+    int memsize;
+} quakeparms_t;
+
+void Host_Init(quakeparms_t *parms);
+void Host_Frame(double time);
+void Host_Shutdown(void);
+double Sys_DoubleTime(void);
+
 // OpenXR Bridge Declarations
 namespace quake {
 namespace vr {
@@ -116,7 +131,7 @@ void android_main(struct android_app *app) {
             if (time > 0.1) time = 0.1;
             oldtime = newtime;
 
-            _Host_Frame(time);
+            Host_Frame(time);
 
             quake::vr::bridge::end_frame();
         }
