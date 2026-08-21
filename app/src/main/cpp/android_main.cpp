@@ -8,8 +8,8 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Quake Engine Parameter Structure (Both tags defined for exact linkage)
-struct quakeparms_t {
+// Quake Engine Parameter Structure (struct tag MUST be quakeparms_s to match host.cpp mangling)
+struct quakeparms_s {
     const char *basedir;
     const char *userdir;
     int argc;
@@ -17,10 +17,10 @@ struct quakeparms_t {
     void *membase;
     int memsize;
 };
-typedef struct quakeparms_t quakeparms_s;
+typedef struct quakeparms_s quakeparms_t;
 
-// Engine Host function prototypes
-void Host_Init(struct quakeparms_t *parms);
+// Engine Host function prototypes matching Quake's exact C++ signatures
+void Host_Init(quakeparms_s *parms);
 void Host_Frame(double time);
 void Host_Shutdown(void);
 double Sys_DoubleTime(void);
@@ -60,7 +60,7 @@ static void on_app_cmd(struct android_app *app, int32_t cmd) {
                         "+vr_movement_mode", "1"
                     };
 
-                    static struct quakeparms_t parms;
+                    static quakeparms_t parms;
                     memset(&parms, 0, sizeof(parms));
                     parms.basedir = "/sdcard/QuakeVR";
                     parms.userdir = "/sdcard/QuakeVR";
