@@ -45,6 +45,7 @@ file(GLOB QUAKE_SOURCES
     ${QUAKE_SRC_DIR}/*.cpp
 )
 
+# Filter out non-Android platform drivers
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_win\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_win32\\.(c|cpp)$")
 list(FILTER QUAKE_SOURCES EXCLUDE REGEX ".*_sdl.*\\.(c|cpp)$")
