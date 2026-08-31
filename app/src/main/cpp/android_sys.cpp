@@ -3,6 +3,8 @@
 #include "sys.hpp"
 #include "vid.hpp"
 #include "cvar.hpp"
+#include "input.hpp"
+#include "q_sound.hpp"
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -19,11 +21,14 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Global Engine State
+// Global Engine State (aligned with Quake headers)
+// Define the engine globals using the exact types declared in the Quake headers
 qboolean isDedicated = qfalse;
-viddef_t vid = { 1920, 1080, 0, 1920 * 4, 4, 0, 640, 480, 0, 1, 0 };
 
-// Video & GL Feature Flags
+// vid is defined in Quake/vid.hpp as `extern viddef_t vid;` — define it here
+viddef_t vid; // members will be initialized explicitly below by VidInitializer
+
+// Video & GL Feature Flags (use qboolean consistent with engine headers)
 qboolean gl_texture_NPOT = qtrue;
 qboolean gl_glsl_alias_able = qtrue;
 qboolean gl_vbo_able = qtrue;
@@ -153,8 +158,9 @@ int Sys_FileTime(const char *path) {
     return -1;
 }
 
-int Sys_mkdir(const char *path) {
-    return mkdir(path, 0777);
+void Sys_mkdir(const char *path) {
+    // sys.hpp declares void Sys_mkdir(const char*), implement accordingly.
+    (void)mkdir(path, 0777);
 }
 
 // Video / Framebuffer Stubs
@@ -182,7 +188,14 @@ void IN_UpdateInputMode(void) {}
 void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
-// Sound DMA Stubs
+// Sound DMA Stubs (signatures must match Quake q_sound.hpp)
+bool SNDDMA_Init(dma_t *dma) { (void)dma; return false; }
+int SNDDMA_GetDMAPos(void) { return 0; }
+void SNDDMA_BlockSound(void) {}
+void SNDDMA_UnblockSound(void) {}
+void SNDDMA_LockBuffer(void) { /* no-op; buffer not used on Android */ }
+void SNDDMA_Submit(void) {}
+void SNDDMA_Shutdown(void) {}
 
 // Client & Server VOIP Stubs
 void S_Voip_Init(void) {}
@@ -220,3 +233,27 @@ extern "C" {
         return "OpenVR unsupported on Quest Standalone (Using OpenXR)";
     }
 }
+
+// Explicit vid initialization to avoid aggregate mismatches with Quake headers
+struct VidInitializer {
+    VidInitializer() {
+        // viddef_t members (from Quake/vid.hpp) - set sensible defaults
+        vid.buffer = nullptr;
+        vid.colormap = nullptr;
+        vid.colormap16 = nullptr;
+        vid.fullbright = 0;
+        vid.rowbytes = 1920 * 4;
+        vid.width = 1920;
+        vid.height = 1080;
+        vid.aspect = 0.0f;
+        vid.numpages = 1;
+        vid.recalc_refdef = 0;
+        vid.conbuffer = nullptr;
+        vid.conrowbytes = 640;
+        vid.conwidth = 480;
+        vid.conheight = 0;
+        vid.maxwarpwidth = 1;
+        vid.maxwarpheight = 0;
+        vid.direct = nullptr;
+    }
+} vid_initializer;
