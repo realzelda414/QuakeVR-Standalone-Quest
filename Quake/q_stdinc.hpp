@@ -1,11 +1,11 @@
 /*
  * q_stdinc.h - includes the minimum necessary stdc headers,
- *		defines common and / or missing types.
+ *	defines common and / or missing types.
  *
  * NOTE:	for net stuff use net_sys.h,
- *		for byte order use q_endian.h,
- *		for math stuff use mathlib.h,
- *		for locale-insensitive ctype.h functions use q_ctype.h.
+ *	for byte order use q_endian.h,
+ *	for math stuff use mathlib.h,
+ *	for locale-insensitive ctype.h functions use q_ctype.h.
  *
  * Copyright (C) 1996-1997  Id Software, Inc.
  * Copyright (C) 2007-2011  O.Sezer <sezero@users.sourceforge.net>
@@ -107,6 +107,20 @@ static_assert(sizeof(THE_DUMMY_ENUM) == sizeof(int), "");
 
 typedef unsigned char byte;
 
+/* Legacy Quake boolean compatibility:
+ * Some older Quake code uses qboolean/qtrue/qfalse. The engine headers
+ * in this project use C++ bool in many places; to avoid type mismatches
+ * and to minimize sweeping changes across the codebase, provide a
+ * consistent alias and macros mapping the legacy names to C++ bool.
+ */
+typedef bool qboolean;
+#ifndef qtrue
+#define qtrue true
+#endif
+#ifndef qfalse
+#define qfalse false
+#endif
+
 #undef true
 #undef false
 
@@ -161,7 +175,7 @@ typedef ptrdiff_t ssize_t;
 #endif
 
 /* argument format attributes for function pointers are supported for gcc >= 3.1
- */
+ * */
 #if defined(__GNUC__) && (__GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ > 0))
 #define FUNCP_PRINTF FUNC_PRINTF
 #else
