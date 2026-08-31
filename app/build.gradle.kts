@@ -20,7 +20,8 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags("-std=c++20 -frtti -fexceptions")
-                arguments("-DANDROID_STL=c++_shared")
+                // Enable verbose CMake / Ninja output to aid debugging native build failures
+                arguments("-DANDROID_STL=c++_shared", "-DCMAKE_VERBOSE_MAKEFILE=ON")
             }
         }
     }
