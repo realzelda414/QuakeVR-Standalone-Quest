@@ -73,6 +73,16 @@ add_library(quakevr SHARED
     vr/quakevr_bridge.cpp
 )
 
+# Ensure target-scoped include directories so Quake headers are found reliably
+target_include_directories(quakevr PRIVATE
+    ${QUAKE_SRC_DIR}
+    ${REPO_ROOT}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/vr
+    ${ANDROID_NDK}/sources/android/native_app_glue
+)
+
 target_link_libraries(quakevr
     PRIVATE
     native_app_glue
