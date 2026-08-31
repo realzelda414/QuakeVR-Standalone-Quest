@@ -71,9 +71,11 @@ add_library(quakevr SHARED
     android_main.cpp
     android_sys.cpp
     vr/quakevr_bridge.cpp
+    snd_android.cpp
 )
 
 # Ensure target-scoped include directories so Quake headers are found reliably
+# and limit visibility to the quakevr target.
 target_include_directories(quakevr PRIVATE
     ${QUAKE_SRC_DIR}
     ${REPO_ROOT}
@@ -83,16 +85,20 @@ target_include_directories(quakevr PRIVATE
     ${ANDROID_NDK}/sources/android/native_app_glue
 )
 
+find_library(log-lib log)
+
+# Link OpenSLES for native Android audio support
 target_link_libraries(quakevr
     PRIVATE
     native_app_glue
     openxr_loader
     android
-    log
+    ${log-lib}
     EGL
     GLESv3
     m
     z
     atomic
     dl
+    OpenSLES
 )
