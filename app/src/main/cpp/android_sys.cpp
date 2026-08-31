@@ -19,26 +19,23 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
-// Global Engine State (aligned with Quake headers)
-// Define the engine globals using the exact types declared in the Quake headers
-bool isDedicated = false;
+// Global Engine State
+qboolean isDedicated = qfalse;
+viddef_t vid = { 1920, 1080, 0, 1920 * 4, 4, 0, 640, 480, 0, 1, 0 };
 
-// vid is defined in Quake/vid.hpp as `extern viddef_t vid;` — define it here
-viddef_t vid; // members will be initialized explicitly below
-
-// Video & GL Feature Flags (use C++ bools consistent with engine headers)
-bool gl_texture_NPOT = true;
-bool gl_glsl_alias_able = true;
-bool gl_vbo_able = true;
-bool gl_glsl_gamma_able = true;
-bool gl_mtexable = true;
-bool gl_texture_env_combine = true;
-bool gl_texture_env_add = true;
-bool gl_texture_astc = true;
-bool gl_texture_s3tc = false;
-bool gl_texture_rgtc = true;
-bool gl_texture_bptc = false;
-bool gl_texture_etc2 = true;
+// Video & GL Feature Flags
+qboolean gl_texture_NPOT = qtrue;
+qboolean gl_glsl_alias_able = qtrue;
+qboolean gl_vbo_able = qtrue;
+qboolean gl_glsl_gamma_able = qtrue;
+qboolean gl_mtexable = qtrue;
+qboolean gl_texture_env_combine = qtrue;
+qboolean gl_texture_env_add = qtrue;
+qboolean gl_texture_astc = qtrue;
+qboolean gl_texture_s3tc = qfalse;
+qboolean gl_texture_rgtc = qtrue;
+qboolean gl_texture_bptc = qfalse;
+qboolean gl_texture_etc2 = qtrue;
 int gl_max_texture_units = 4;
 float gl_max_anisotropy = 4.0f;
 int gl_stencilbits = 8;
@@ -186,13 +183,6 @@ void IN_Move(usercmd_t *cmd) { (void)cmd; }
 void Sys_SendKeyEvents(void) {}
 
 // Sound DMA Stubs
-int SNDDMA_Init(dma_t *dma) { (void)dma; return 0; }
-int SNDDMA_GetDMAPos(void) { return 0; }
-void SNDDMA_BlockSound(void) {}
-void SNDDMA_UnblockSound(void) {}
-void* SNDDMA_LockBuffer(void) { return NULL; }
-void SNDDMA_Submit(void) {}
-void SNDDMA_Shutdown(void) {}
 
 // Client & Server VOIP Stubs
 void S_Voip_Init(void) {}
@@ -230,27 +220,3 @@ extern "C" {
         return "OpenVR unsupported on Quest Standalone (Using OpenXR)";
     }
 }
-
-// Explicit vid initialization to avoid aggregate mismatches with Quake headers
-struct VidInitializer {
-    VidInitializer() {
-        // viddef_t members (from Quake/vid.hpp) - set sensible defaults
-        vid.buffer = nullptr;
-        vid.colormap = nullptr;
-        vid.colormap16 = nullptr;
-        vid.fullbright = 0;
-        vid.rowbytes = 1920 * 4;
-        vid.width = 1920;
-        vid.height = 1080;
-        vid.aspect = 0.0f;
-        vid.numpages = 1;
-        vid.recalc_refdef = 0;
-        vid.conbuffer = nullptr;
-        vid.conrowbytes = 640;
-        vid.conwidth = 480;
-        vid.conheight = 0;
-        vid.maxwarpwidth = 1;
-        vid.maxwarpheight = 0;
-        vid.direct = nullptr;
-    }
-} vid_initializer;
